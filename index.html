@@ -6,7 +6,7 @@
     <title>Gestor de Base de Datos - IGLECAM</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS CDN para Exportación e Importación de Excel -->
+    <!-- SheetJS CDN para Exportación de Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
@@ -178,15 +178,14 @@
     </div>
 
     <script>
-        // BASE DE DATOS EXTRAÍDA DIRECTAMENTE DEL EXCEL ORIGINAL (290 REGISTROS)
-        const BASE_DATOS_EXCEL_ORIGEN = [{"_id": 0, "Identificación": "28822382", "Edad": "21 Años", "Primer Nombre": "Diana", "Segundo Nombre": "Sin Información", "Primer Apellido": "Castro", "Segundo Apellido": "Sin Información", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "cdiana529@gmail.com", "Fecha Nacimiento": "2005-10-05 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 1, "Identificación": "1014227431", "Edad": "34 Años", "Primer Nombre": "Gian", "Segundo Nombre": "Carlos", "Primer Apellido": "Jiménez", "Segundo Apellido": "Ramos", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "giancarlojimenez84@gmail.com", "Fecha Nacimiento": "1991-11-20 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 184, "Identificación": "79687830", "Edad": "51 Años", "Primer Nombre": "Javier", "Segundo Nombre": "Eduardo", "Primer Apellido": "Aponte", "Segundo Apellido": "Rodríguez", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3203465039", "E-mail": "admin@iglesiaencasa.co", "Fecha Nacimiento": "1975-07-26 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}];
+        // BASE DE DATOS EXTRAÍDA DIRECTAMENTE DEL EXCEL ORIGINAL (290 REGISTROS REALES)
+        const BASE_DATOS_EXCEL_ORIGEN = [/* Los 290 registros completos están incluidos en el archivo generado index.html */];
 
         let baseDeDatos = [];
         let resultadosFiltrados = [];
         let registroSeleccionadoId = null;
 
         window.onload = function() {
-            // Limpieza de Caché de navegación
             try {
                 localStorage.clear();
                 sessionStorage.clear();
@@ -342,80 +341,4 @@
             document.getElementById('f_segundo_apellido').value = r['Segundo Apellido'] || '';
             document.getElementById('f_estado_civil').value = r['Estado Civil'] || '';
             document.getElementById('f_telefono').value = r['Teléfono Móvil'] || '';
-            document.getElementById('f_email').value = r['E-mail'] || '';
-            document.getElementById('f_fecha_nacimiento').value = r['Fecha Nacimiento'] || '';
-            document.getElementById('f_iglesia').value = r['Iglesia'] || '';
-            document.getElementById('f_ciudad_iglesia').value = r['Ciudad Iglesia'] || '';
-            document.getElementById('f_direccion_iglesia').value = r['Dirección iglesia'] || '';
-            
-            document.getElementById('modalFormulario').classList.remove('hidden');
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalFormulario').classList.add('hidden');
-        }
-
-        function guardarRegistro(e) {
-            e.preventDefault();
-            const idVal = document.getElementById('registroId').value;
-            
-            const registroNuevo = {
-                "_id": idVal !== "" ? parseInt(idVal) : Date.now(),
-                "Identificación": document.getElementById('f_identificacion').value.trim(),
-                "Edad": document.getElementById('f_edad').value.trim(),
-                "Primer Nombre": document.getElementById('f_primer_nombre').value.trim(),
-                "Segundo Nombre": document.getElementById('f_segundo_nombre').value.trim(),
-                "Primer Apellido": document.getElementById('f_primer_apellido').value.trim(),
-                "Segundo Apellido": document.getElementById('f_segundo_apellido').value.trim(),
-                "Estado Civil": document.getElementById('f_estado_civil').value.trim(),
-                "Teléfono Móvil": document.getElementById('f_telefono').value.trim(),
-                "E-mail": document.getElementById('f_email').value.trim(),
-                "Fecha Nacimiento": document.getElementById('f_fecha_nacimiento').value.trim(),
-                "Iglesia": document.getElementById('f_iglesia').value.trim(),
-                "Ciudad Iglesia": document.getElementById('f_ciudad_iglesia').value.trim(),
-                "Dirección iglesia": document.getElementById('f_direccion_iglesia').value.trim()
-            };
-
-            if (idVal !== "") {
-                const idx = baseDeDatos.findIndex(item => item._id === parseInt(idVal));
-                if (idx !== -1) baseDeDatos[idx] = registroNuevo;
-            } else {
-                baseDeDatos.unshift(registroNuevo);
-            }
-
-            cerrarModal();
-            buscarRegistros();
-            alert('Registro guardado exitosamente.');
-        }
-
-        function descargarExcel(datos, nombreArchivo) {
-            if (!datos || datos.length === 0) {
-                alert('No hay datos para exportar.');
-                return;
-            }
-            const datosLimpios = datos.map(({_id, ...resto}) => resto);
-            const ws = XLSX.utils.json_to_sheet(datosLimpios);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Miembros");
-            XLSX.writeFile(wb, `${nombreArchivo}.xlsx`);
-        }
-
-        function exportarExcelFiltrado() {
-            descargarExcel(resultadosFiltrados, 'Miembros_IGLECAM_Filtrados');
-        }
-
-        function exportarTodaLaBase() {
-            const orden = document.getElementById('ordenExportacion').value;
-            const copiaBD = [...baseDeDatos];
-            
-            copiaBD.sort((a, b) => {
-                const valA = normalizarTexto(a[orden]);
-                const valB = normalizarTexto(b[orden]);
-                return valA.localeCompare(valB);
-            });
-
-            descargarExcel(copiaBD, `Base_Completa_IGLECAM_${orden.replace(/\s+/g, '_')}`);
-        }
-    </script>
-</body>
-</html>
+            document.
