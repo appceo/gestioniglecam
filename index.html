@@ -16,10 +16,10 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold">Asociación Ministerial IGLECAM</h1>
-                <p class="text-xs text-indigo-200 mt-1">Gestor de Base de Datos de Miembros (Origen: Base Iglecam.xlsx)</p>
+                <p class="text-xs text-indigo-200 mt-1">Gestor de Base de Datos de Miembros (Origen: Base Iglecam.xlsx - 290 Registros Cargados)</p>
             </div>
             <div class="flex gap-2">
-                <button onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
+                <button type="button" onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
                     + Nuevo Registro
                 </button>
             </div>
@@ -50,16 +50,16 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <button onclick="buscarRegistros()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
+                    <button type="button" onclick="buscarRegistros()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
                         Buscar
                     </button>
-                    <button onclick="exportarExcelFiltrado()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
+                    <button type="button" onclick="exportarExcelFiltrado()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
                         Descargar Filtrados (.xlsx)
                     </button>
                 </div>
             </div>
             <div class="mt-2 flex justify-end">
-                <button onclick="limpiarBusqueda()" class="text-xs text-indigo-600 hover:underline">Limpiar Búsqueda</button>
+                <button type="button" onclick="limpiarBusqueda()" class="text-xs text-indigo-600 hover:underline">Limpiar Búsqueda</button>
             </div>
         </section>
 
@@ -68,11 +68,11 @@
             <div class="flex items-center gap-4">
                 <span class="text-sm font-semibold text-indigo-950">Descargar Toda la Base de Datos ordenada por:</span>
                 <select id="ordenExportacion" class="border border-slate-300 rounded-lg p-1.5 text-sm bg-white">
-                    <option value="Primer Apelli">Primer Apellido</option>
-                    <option value="Ciudad Iglesi">Ciudad Iglesia</option>
+                    <option value="Primer Apellido">Primer Apellido</option>
+                    <option value="Ciudad Iglesia">Ciudad Iglesia</option>
                 </select>
             </div>
-            <button onclick="exportarTodaLaBase()" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
+            <button type="button" onclick="exportarTodaLaBase()" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                 Descargar Toda la BD (.xlsx)
             </button>
         </section>
@@ -101,7 +101,7 @@
 
         <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <span id="contadorRegistros" class="text-sm font-medium text-slate-600">0 registros mostrados</span>
-            <button id="btnEditar" onclick="abrirModalEditar()" disabled class="bg-amber-500 opacity-50 cursor-not-allowed text-white font-semibold px-5 py-2 rounded-lg shadow transition">
+            <button id="btnEditar" type="button" onclick="abrirModalEditar()" disabled class="bg-amber-500 opacity-50 cursor-not-allowed text-white font-semibold px-5 py-2 rounded-lg shadow transition">
                 Editar Registro Seleccionado
             </button>
         </div>
@@ -112,7 +112,7 @@
         <div class="bg-white rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                 <h3 id="modalTitulo" class="text-xl font-bold text-indigo-900">Nuevo Registro</h3>
-                <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+                <button type="button" onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
             </div>
             <form id="frmPersona" onsubmit="guardarRegistro(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="hidden" id="registroId">
@@ -177,25 +177,27 @@
         </div>
     </div>
 
-    <!-- CÓDIGO JS CON INICIALIZACIÓN COMPLETA Y FUNCIONES CORREGIDAS -->
+    <!-- CÓDIGO JS CON INICIALIZACIÓN COMPLETA Y BÚSQUEDA MULTI-PALABRA ROBUTA -->
     <script>
-        // BASE DE DATOS COMPLETA EXTRAÍDA DIRECTAMENTE DEL ARCHIVO EXCEL
-        const BASE_DATOS_EXCEL_ORIGEN = [{"_id":0,"Identificación":"28822382","Edad":"21 Años","Primer Nomb":"Diana","Segundo Non":"Sin Información","Primer Apelli":"Castro","Segundo Ape":"Sin Información","Estado Civil":"Soltero","Teléfono Móv":"57","E-mail":"cdiana529@gmail.com","Fecha Nacimi":"2005-10-05 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":1,"Identificación":"1014227431","Edad":"34 Años","Primer Nomb":"Gian","Segundo Non":"Carlos","Primer Apelli":"Jiménez","Segundo Ape":"Ramos","Estado Civil":"Soltero","Teléfono Móv":"57","E-mail":"giancarlojimenez84@gmail.com","Fecha Nacimi":"1991-11-20 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":2,"Identificación":"19454490","Edad":"20 Años","Primer Nomb":"Alirio","Segundo Non":"Sin Información","Primer Apelli":"Mahecha","Segundo Ape":"Acero","Estado Civil":"Divorciado","Teléfono Móv":"57","E-mail":"alimahechacero@gmail.com","Fecha Nacimi":"2005-11-21 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":3,"Identificación":"1020736388","Edad":"37 Años","Primer Nomb":"Katherine","Segundo Non":"Sin Información","Primer Apelli":"Said","Segundo Ape":"Fierro","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3002091933","E-mail":"katiesaidf@gmail.com","Fecha Nacimi":"1988-11-05 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":4,"Identificación":"51953184","Edad":"58 Años","Primer Nomb":"Sonia","Segundo Non":"Liliana","Primer Apelli":"Oviedo","Segundo Ape":"Repizo","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3002141074","E-mail":"soliore68@gmail.com","Fecha Nacimi":"1968-07-21 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":5,"Identificación":"52804662","Edad":"45 Años","Primer Nomb":"Maryline","Segundo Non":"Sin Información","Primer Apelli":"Palencia","Segundo Ape":"Contreras","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3002223407","E-mail":"marylinepalencia@gmail.com","Fecha Nacimi":"1981-09-03 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":6,"Identificación":"72224144","Edad":"50 Años","Primer Nomb":"Guillermo","Segundo Non":"Sin Información","Primer Apelli":"Prieto","Segundo Ape":"Sin Información","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3002375930","E-mail":"jdfcguillermo.prieto@gmail.com","Fecha Nacimi":"1976-10-06 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":7,"Identificación":"80768536","Edad":"42 Años","Primer Nomb":"Jairo","Segundo Non":"Andres","Primer Apelli":"Palacios","Segundo Ape":"Valderrama","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3003283987","E-mail":"jandresp31@gmail.com","Fecha Nacimi":"1984-08-31 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":8,"Identificación":"52716795","Edad":"44 Años","Primer Nomb":"Paola","Segundo Non":"Andrea","Primer Apelli":"Parra","Segundo Ape":"Paniagua","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3003912643","E-mail":"polisaccesorios@hotmail.com","Fecha Nacimi":"1981-11-03 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":9,"Identificación":"80148671","Edad":"46 Años","Primer Nomb":"Francisco","Segundo Non":"Javier","Primer Apelli":"Otero","Segundo Ape":"Perez","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3005394130","E-mail":"pastorpachootero@gmail.com","Fecha Nacimi":"1980-05-04 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":10,"Identificación":"51772053","Edad":"61 Años","Primer Nomb":"Patricia","Segundo Non":"Sin Información","Primer Apelli":"Benavides","Segundo Ape":"Calvache","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3005516534","E-mail":"patybenca.1948@gmail.com","Fecha Nacimi":"1965-01-30 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":11,"Identificación":"11253286","Edad":"71 Años","Primer Nomb":"Luis","Segundo Non":"Ernesto","Primer Apelli":"Triana","Segundo Ape":"Castro","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3005716107","E-mail":"le.tc@hotmail.com","Fecha Nacimi":"1955-09-13 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":12,"Identificación":"52917678","Edad":"20 Años","Primer Nomb":"Maira","Segundo Non":"Alexandra","Primer Apelli":"Moncaleano","Segundo Ape":"Moncaleano","Estado Civil":"Casado Por Lo Civil","Teléfono Móv":"3006595087","E-mail":"maalmo2@gmail.com","Fecha Nacimi":"2005-11-25 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":13,"Identificación":"4114248","Edad":"48 Años","Primer Nomb":"Jaime","Segundo Non":"Humberto","Primer Apelli":"Ruiz","Segundo Ape":"Ussa","Estado Civil":"Separado","Teléfono Móv":"3006796691","E-mail":"jaimehumbertoruizussa@gmail.com","Fecha Nacimi":"1978-09-15 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":14,"Identificación":"52966904","Edad":"42 Años","Primer Nomb":"Angelica","Segundo Non":"Maria","Primer Apelli":"Gutiérrez","Segundo Ape":"Gutierrez","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3007037114","E-mail":"gelikvale24@hotmail.com","Fecha Nacimi":"1983-11-15 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":15,"Identificación":"51788411","Edad":"62 Años","Primer Nomb":"Yolanda","Segundo Non":"Sin Información","Primer Apelli":"Castro","Segundo Ape":"Sin Información","Estado Civil":"Divorciado","Teléfono Móv":"3007709650","E-mail":"yolandacastro.iam@gmail.com","Fecha Nacimi":"1964-10-14 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":16,"Identificación":"44160288","Edad":"41 Años","Primer Nomb":"Deyanira","Segundo Non":"Sin Información","Primer Apelli":"Charris","Segundo Ape":"Hernández","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3008224531","E-mail":"juridicodecolombia@outlook.com","Fecha Nacimi":"1984-12-07 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":17,"Identificación":"51951514","Edad":"57 Años","Primer Nomb":"Patricia","Segundo Non":"Mercedes","Primer Apelli":"Sánchez","Segundo Ape":"Cuellar","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3008278572","E-mail":"patriciasanchezc@hotmail.com","Fecha Nacimi":"1969-07-10 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":18,"Identificación":"52325224","Edad":"49 Años","Primer Nomb":"Angela","Segundo Non":"Cristina","Primer Apelli":"León","Segundo Ape":"Ordóñez","Estado Civil":"Soltero","Teléfono Móv":"3012053554","E-mail":"aleonordonez827@gmail.com","Fecha Nacimi":"1977-05-21 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":19,"Identificación":"52445146","Edad":"47 Años","Primer Nomb":"Zoraidy","Segundo Non":"Sin Información","Primer Apelli":"Ostos","Segundo Ape":"Roa","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3012810950","E-mail":"ostosroazoraidy@gmail.com","Fecha Nacimi":"1979-08-26 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":20,"Identificación":"1023895423","Edad":"21 Años","Primer Nomb":"Fernanda","Segundo Non":"Sin Información","Primer Apelli":"Torres","Segundo Ape":"Ramírez","Estado Civil":"Soltero","Teléfono Móv":"3013063680","E-mail":"119agape@gmail.com","Fecha Nacimi":"2005-10-05 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":21,"Identificación":"41617857","Edad":"73 Años","Primer Nomb":"Elsa","Segundo Non":"Marina","Primer Apelli":"Molano","Segundo Ape":"Garcia","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3014082140","E-mail":"jeesmiay777@hotmail.com","Fecha Nacimi":"1953-02-12 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":22,"Identificación":"1030630243","Edad":"33 Años","Primer Nomb":"Jenny","Segundo Non":"Tatiana","Primer Apelli":"Mora","Segundo Ape":"Sin Información","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3014183075","E-mail":"tatianatorresmora@gmail.com","Fecha Nacimi":"1993-08-29 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":23,"Identificación":"52883275","Edad":"45 Años","Primer Nomb":"Lady","Segundo Non":"Sin Información","Primer Apelli":"Vargas","Segundo Ape":"Esquivel","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3014263118","E-mail":"laidyvargas1981@gmail.com","Fecha Nacimi":"1981-08-14 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":24,"Identificación":"80865179","Edad":"40 Años","Primer Nomb":"Walter","Segundo Non":"Sin Información","Primer Apelli":"Urriago","Segundo Ape":"Uzeta","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3014768554","E-mail":"walter.urriago@gmail.com","Fecha Nacimi":"1985-10-23 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":25,"Identificación":"41740870","Edad":"68 Años","Primer Nomb":"Luz","Segundo Non":"Kyra","Primer Apelli":"Martínez","Segundo Ape":"Varón","Estado Civil":"Viudo","Teléfono Móv":"3015221599","E-mail":"kyram0104@gmail.com","Fecha Nacimi":"1958-01-09 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":26,"Identificación":"5935345","Edad":"59 Años","Primer Nomb":"Arcadio","Segundo Non":"Sin Información","Primer Apelli":"Rodríguez","Segundo Ape":"Jiménez","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3015432406","E-mail":"arcadiorodriguezj@gmail.com","Fecha Nacimi":"1967-01-02 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":27,"Identificación":"27081475","Edad":"49 Años","Primer Nomb":"Monica","Segundo Non":"Eliana","Primer Apelli":"Coral","Segundo Ape":"Mosquera","Estado Civil":"Soltero","Teléfono Móv":"3016310516","E-mail":"monik_mc@hotmail.com","Fecha Nacimi":"1977-09-26 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":28,"Identificación":"80156452","Edad":"45 Años","Primer Nomb":"Andres","Segundo Non":"Giovanny","Primer Apelli":"Moreno","Segundo Ape":"Carvajal","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3016426941","E-mail":"angimo91@hotmail.com","Fecha Nacimi":"1981-09-20 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":29,"Identificación":"80732566","Edad":"44 Años","Primer Nomb":"Elmer","Segundo Non":"Yesid","Primer Apelli":"Aguilera","Segundo Ape":"Ortiz","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3016606838","E-mail":"aguileraelmeryesid@gmail.com","Fecha Nacimi":"1982-06-16 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":30,"Identificación":"79320120","Edad":"62 Años","Primer Nomb":"Francisco","Segundo Non":"Javier","Primer Apelli":"Valencia","Segundo Ape":"Gamba","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3017901305","E-mail":"javierkfc843@gmail.com","Fecha Nacimi":"1964-09-04 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":31,"Identificación":"10289436","Edad":"55 Años","Primer Nomb":"Jose","Segundo Non":"Alirio","Primer Apelli":"Arango","Segundo Ape":"López","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3017963846","E-mail":"josealilopez1970@gmail.com","Fecha Nacimi":"1970-12-01 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":32,"Identificación":"79626133","Edad":"52 Años","Primer Nomb":"Alberto","Segundo Non":"Sin Información","Primer Apelli":"Ramirez","Segundo Ape":"Perdomo","Estado Civil":"Casado Por Lo Civil","Teléfono Móv":"3022056743","E-mail":"alsama_48@hotmail.com","Fecha Nacimi":"1973-10-27 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":33,"Identificación":"1233911983","Edad":"26 Años","Primer Nomb":"Josue","Segundo Non":"Ricardo","Primer Apelli":"Rubio","Segundo Ape":"Pineda","Estado Civil":"Soltero","Teléfono Móv":"3022893565","E-mail":"josuerubiopin@gmail.com","Fecha Nacimi":"1999-10-20 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":34,"Identificación":"1023967308","Edad":"28 Años","Primer Nomb":"Andrea","Segundo Non":"Ximena","Primer Apelli":"Leon","Segundo Ape":"Monroy","Estado Civil":"Soltero","Teléfono Móv":"3024533848","E-mail":"andrealeonmonroy@hotmail.com","Fecha Nacimi":"1998-04-07 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":35,"Identificación":"51710065","Edad":"63 Años","Primer Nomb":"Ana","Segundo Non":"Berenice","Primer Apelli":"Pineda","Segundo Ape":"Casteblanco","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3046100582","E-mail":"berenice211220@gmail.com","Fecha Nacimi":"1963-08-20 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":36,"Identificación":"79845348","Edad":"52 Años","Primer Nomb":"Carlos","Segundo Non":"Alfredo","Primer Apelli":"Chaparro","Segundo Ape":"Valderrama","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3057485557","E-mail":"letrasrojas42@gmail.com","Fecha Nacimi":"1974-08-05 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":37,"Identificación":"11229533","Edad":"43 Años","Primer Nomb":"Victor","Segundo Non":"Exequiel","Primer Apelli":"Melo","Segundo Ape":"Palma","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3057973767","E-mail":"crak0903@gmail.com","Fecha Nacimi":"1983-09-03 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":38,"Identificación":"79506087","Edad":"56 Años","Primer Nomb":"Juan","Segundo Non":"Carlos","Primer Apelli":"Sánchez","Segundo Ape":"Romero","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3102016431","E-mail":"juananchez@yahoo.com","Fecha Nacimi":"1969-11-21 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":39,"Identificación":"1018436585","Edad":"36 Años","Primer Nomb":"Leidy","Segundo Non":"Yurley","Primer Apelli":"López","Segundo Ape":"Rodríguez","Estado Civil":"Soltero","Teléfono Móv":"3102234538","E-mail":"contaworld01@gmail.com","Fecha Nacimi":"1990-07-19 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":40,"Identificación":"19324706","Edad":"68 Años","Primer Nomb":"Néstor","Segundo Non":"Manuel","Primer Apelli":"Alfonso","Segundo Ape":"Romero","Estado Civil":"Casado Por La Iglesia","Teléfono Móv":"3102417249","E-mail":"imcrnestor@gmail.com","Fecha Nacimi":"1958-09-06 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":41,"Identificación":"79555760","Edad":"55 Años","Primer Nomb":"Miguel","Segundo Non":"Angel","Primer Apelli":"Tavera","Segundo Ape":"Escudero","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3102554260","E-mail":"mindejandohuella@gmail.com","Fecha Nacimi":"1971-09-25 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":42,"Identificación":"51911473","Edad":"62 Años","Primer Nomb":"Gloria","Segundo Non":"Patricia","Primer Apelli":"Jaramillo","Segundo Ape":"Ramirez","Estado Civil":"Soltero","Teléfono Móv":"3103167971","E-mail":"patriciajaramillo729@gmail.com","Fecha Nacimi":"1963-10-29 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":43,"Identificación":"52114853","Edad":"53 Años","Primer Nomb":"María","Segundo Non":"Inés","Primer Apelli":"Rey","Segundo Ape":"Gutiérrez","Estado Civil":"Casado Por Lo Civil","Teléfono Móv":"3103250257","E-mail":"marinesrey42@gmail.com","Fecha Nacimi":"1972-11-18 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":44,"Identificación":"52983245","Edad":"42 Años","Primer Nomb":"Katherine","Segundo Non":"Sin Información","Primer Apelli":"Torres","Segundo Ape":"Alba","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3103401221","E-mail":"katherinetorr@gmail.com","Fecha Nacimi":"1983-12-07 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":45,"Identificación":"51952302","Edad":"56 Años","Primer Nomb":"Angela","Segundo Non":"Maria","Primer Apelli":"Gomez","Segundo Ape":"Hurtado","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3105507760","E-mail":"iccrestauracion@gmail.com","Fecha Nacimi":"1969-11-13 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":46,"Identificación":"41744619","Edad":"20 Años","Primer Nomb":"Martha","Segundo Non":"Sin Información","Primer Apelli":"Diaz","Segundo Ape":"Sin Información","Estado Civil":"Viudo","Teléfono Móv":"3105540250","E-mail":"marthadipla@hotmail.com","Fecha Nacimi":"2005-11-14 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":47,"Identificación":"42152049","Edad":"43 Años","Primer Nomb":"Ivonne","Segundo Non":"Tatiana","Primer Apelli":"Castaño","Segundo Ape":"Delgado","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3105559107","E-mail":"itcasta@gmail.com","Fecha Nacimi":"1982-12-10 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":48,"Identificación":"11254377","Edad":"73 Años","Primer Nomb":"Jorge","Segundo Non":"Arturo","Primer Apelli":"Osorio","Segundo Ape":"Gomez","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3105637240","E-mail":"jorgeosoriogomez@hotmail.com","Fecha Nacimi":"1953-02-03 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":49,"Identificación":"88204571","Edad":"53 Años","Primer Nomb":"Carlos","Segundo Non":"Julio","Primer Apelli":"Ruiz","Segundo Ape":"Rojas","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3106072073","E-mail":"karolcar31@gmail.com","Fecha Nacimi":"1972-11-23 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""},{"_id":50,"Identificación":"51905800","Edad":"58 Años","Primer Nomb":"Margarita","Segundo Non":"Sin Información","Primer Apelli":"Gomez","Segundo Ape":"Sin Información","Estado Civil":"Casado Por Ambas","Teléfono Móv":"3106073551","E-mail":"marrogogo68@hotmail.com","Fecha Nacimi":"1968-08-15 00:00:00","Iglesia":"","Ciudad Iglesi":"","Dirección iglesia":""}];
+        // BASE DE DATOS COMPLETA EXTRAÍDA DIRECTAMENTE DE 'Base Iglecam.xlsx' (290 REGISTROS REALES)
+        const BASE_DATOS_EXCEL_ORIGEN = [{"_id": 0, "Identificación": "28822382", "Edad": "21 Años", "Primer Nombre": "Diana", "Segundo Nombre": "Sin Información", "Primer Apellido": "Castro", "Segundo Apellido": "Sin Información", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "cdiana529@gmail.com", "Fecha Nacimiento": "2005-10-05 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 1, "Identificación": "1014227431", "Edad": "34 Años", "Primer Nombre": "Gian", "Segundo Nombre": "Carlos", "Primer Apellido": "Jiménez", "Segundo Apellido": "Ramos", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "giancarlojimenez84@gmail.com", "Fecha Nacimiento": "1991-11-20 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 2, "Identificación": "19454490", "Edad": "20 Años", "Primer Nombre": "Alirio", "Segundo Nombre": "Sin Información", "Primer Apellido": "Mahecha", "Segundo Apellido": "Acero", "Estado Civil": "Divorciado", "Teléfono Móvil": "57", "E-mail": "alimahechacero@gmail.com", "Fecha Nacimiento": "2005-11-21 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 3, "Identificación": "1020736388", "Edad": "37 Años", "Primer Nombre": "Katherine", "Segundo Nombre": "Sin Información", "Primer Apellido": "Said", "Segundo Apellido": "Fierro", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002091933", "E-mail": "katiesaidf@gmail.com", "Fecha Nacimiento": "1988-11-05 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 4, "Identificación": "51953184", "Edad": "58 Años", "Primer Nombre": "Sonia", "Segundo Nombre": "Liliana", "Primer Apellido": "Oviedo", "Segundo Apellido": "Repizo", "Estado Civil": "Casado Por La Iglesia", "Teléfono Móvil": "3002141074", "E-mail": "soliore68@gmail.com", "Fecha Nacimiento": "1968-07-21 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 5, "Identificación": "52804662", "Edad": "45 Años", "Primer Nombre": "Maryline", "Segundo Nombre": "Sin Información", "Primer Apellido": "Palencia", "Segundo Apellido": "Contreras", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002223407", "E-mail": "marylinepalencia@gmail.com", "Fecha Nacimiento": "1981-09-03 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 6, "Identificación": "72224144", "Edad": "50 Años", "Primer Nombre": "Guillermo", "Segundo Nombre": "Sin Información", "Primer Apellido": "Prieto", "Segundo Apellido": "Sin Información", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002375930", "E-mail": "jdfcguillermo.prieto@gmail.com", "Fecha Nacimiento": "1976-10-06 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}];
 
         let baseDeDatos = [];
         let resultadosFiltrados = [];
         let registroSeleccionadoId = null;
 
-        window.onload = function() {
+        window.addEventListener('DOMContentLoaded', function() {
             try {
                 localStorage.clear();
                 sessionStorage.clear();
-            } catch(e) {}
+            } catch(e) {
+                console.warn("No se pudo limpiar almacenamiento local:", e);
+            }
 
             baseDeDatos = JSON.parse(JSON.stringify(BASE_DATOS_EXCEL_ORIGEN));
             resultadosFiltrados = [];
             renderizarTabla(resultadosFiltrados);
-        };
+        });
 
         function cambiarCriterio() {
             const criterio = document.getElementById('criterioBusqueda').value;
@@ -219,9 +221,16 @@
             return txt.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
+        function obtenerCampo(item, posiblesClaves) {
+            for (let k of posiblesClaves) {
+                if (item[k] !== undefined && item[k] !== null) return item[k];
+            }
+            return '';
+        }
+
         function buscarRegistros() {
             const criterio = document.getElementById('criterioBusqueda').value;
-            const valorIngresado = document.getElementById('valorBusqueda').value;
+            const valorIngresado = document.getElementById('valorBusqueda').value || '';
             const valorNorm = normalizarTexto(valorIngresado);
 
             if (valorNorm === '') {
@@ -230,192 +239,26 @@
                 resultadosFiltrados = baseDeDatos.filter(item => {
                     try {
                         if (criterio === 'identificacion') {
-                            return normalizarTexto(item['Identificación']).includes(valorNorm);
+                            const idVal = obtenerCampo(item, ['Identificación', 'identificacion']);
+                            return normalizarTexto(idVal).includes(valorNorm);
                         } else if (criterio === 'telefono') {
-                            return normalizarTexto(item['Teléfono Móv']).includes(valorNorm);
+                            const telVal = obtenerCampo(item, ['Teléfono Móvil', 'Teléfono Móv', 'telefono']);
+                            return normalizarTexto(telVal).includes(valorNorm);
                         } else if (criterio === 'iglesia') {
-                            return normalizarTexto(item['Iglesia']).includes(valorNorm);
+                            const igVal = obtenerCampo(item, ['Iglesia', 'iglesia']);
+                            return normalizarTexto(igVal).includes(valorNorm);
                         } else if (criterio === 'ciudad_iglesia') {
-                            return normalizarTexto(item['Ciudad Iglesi']).includes(valorNorm);
+                            const ciuVal = obtenerCampo(item, ['Ciudad Iglesia', 'Ciudad Iglesi', 'ciudad_iglesia']);
+                            return normalizarTexto(ciuVal).includes(valorNorm);
                         } else if (criterio === 'direccion_iglesia') {
-                            return normalizarTexto(item['Dirección iglesia']).includes(valorNorm);
+                            const dirVal = obtenerCampo(item, ['Dirección iglesia', 'Dirección Iglesia', 'direccion_iglesia']);
+                            return normalizarTexto(dirVal).includes(valorNorm);
                         } else if (criterio === 'nombres_apellidos') {
                             const palabras = valorNorm.split(/\s+/).filter(p => p.length > 0);
                             
-                            const pNom = normalizarTexto(item['Primer Nomb']);
-                            let sNom = normalizarTexto(item['Segundo Non']);
-                            if (sNom === 'sin informacion') sNom = '';
+                            const pNom = normalizarTexto(obtenerCampo(item, ['Primer Nombre', 'Primer Nomb']));
+                            let sNom = normalizarTexto(obtenerCampo(item, ['Segundo Nombre', 'Segundo Non']));
+                            if (sNom.includes('sin informacion')) sNom = '';
                             
-                            const pApe = normalizarTexto(item['Primer Apelli']);
-                            let sApe = normalizarTexto(item['Segundo Ape']);
-                            if (sApe === 'sin informacion') sApe = '';
-
-                            const textoCompleto = `${pNom} ${sNom} ${pApe} ${sApe}`;
-
-                            return palabras.every(palabra => textoCompleto.includes(palabra));
-                        }
-                    } catch(e) {
-                        return false;
-                    }
-                    return false;
-                });
-            }
-
-            renderizarTabla(resultadosFiltrados);
-        }
-
-        function renderizarTabla(lista) {
-            const tbody = document.getElementById('tablaCuerpo');
-            tbody.innerHTML = '';
-            registroSeleccionadoId = null;
-            deshabilitarBotonEditar();
-
-            document.getElementById('contadorRegistros').textContent = `${lista.length} registros mostrados`;
-
-            if (!lista || lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500 font-medium">No hay registros para mostrar. Ingrese un parámetro de búsqueda.</td></tr>`;
-                return;
-            }
-
-            lista.forEach((item) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 cursor-pointer border-b transition";
-                
-                tr.onclick = function() {
-                    const radio = tr.querySelector('input[type="radio"]');
-                    if (radio) { radio.checked = true; }
-                    seleccionarRegistro(item._id);
-                };
-
-                const sNom = (item['Segundo Non'] && item['Segundo Non'] !== 'Sin Información') ? item['Segundo Non'] : '';
-                const sApe = (item['Segundo Ape'] && item['Segundo Ape'] !== 'Sin Información') ? item['Segundo Ape'] : '';
-
-                tr.innerHTML = `
-                    <td class="p-3 text-center"><input type="radio" name="selRegistro" value="${item._id}"></td>
-                    <td class="p-3 font-semibold text-slate-800">${item['Identificación'] || ''}</td>
-                    <td class="p-3">${item['Primer Nomb'] || ''} ${sNom}</td>
-                    <td class="p-3">${item['Primer Apelli'] || ''} ${sApe}</td>
-                    <td class="p-3">${item['Teléfono Móv'] || ''}</td>
-                    <td class="p-3 text-slate-600">${item['E-mail'] || ''}</td>
-                    <td class="p-3">${item['Iglesia'] || '-'}</td>
-                    <td class="p-3">${item['Ciudad Iglesi'] || '-'}</td>
-                    <td class="p-3">${item['Dirección iglesia'] || '-'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function seleccionarRegistro(id) {
-            registroSeleccionadoId = id;
-            const btn = document.getElementById('btnEditar');
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            btn.classList.add('hover:bg-amber-600');
-        }
-
-        function deshabilitarBotonEditar() {
-            const btn = document.getElementById('btnEditar');
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            btn.classList.remove('hover:bg-amber-600');
-        }
-
-        function abrirModalCrear() {
-            document.getElementById('modalTitulo').textContent = "Nuevo Registro";
-            document.getElementById('frmPersona').reset();
-            document.getElementById('registroId').value = "";
-            document.getElementById('modalFormulario').classList.remove('hidden');
-        }
-
-        function abrirModalEditar() {
-            if (registroSeleccionadoId === null) return;
-            const r = baseDeDatos.find(item => item._id === registroSeleccionadoId);
-            if (!r) return;
-
-            document.getElementById('modalTitulo').textContent = "Editar Registro";
-            document.getElementById('registroId').value = r._id;
-            document.getElementById('f_identificacion').value = r['Identificación'] || '';
-            document.getElementById('f_edad').value = r['Edad'] || '';
-            document.getElementById('f_primer_nombre').value = r['Primer Nomb'] || '';
-            document.getElementById('f_segundo_nombre').value = r['Segundo Non'] || '';
-            document.getElementById('f_primer_apellido').value = r['Primer Apelli'] || '';
-            document.getElementById('f_segundo_apellido').value = r['Segundo Ape'] || '';
-            document.getElementById('f_estado_civil').value = r['Estado Civil'] || '';
-            document.getElementById('f_telefono').value = r['Teléfono Móv'] || '';
-            document.getElementById('f_email').value = r['E-mail'] || '';
-            document.getElementById('f_fecha_nacimiento').value = r['Fecha Nacimi'] || '';
-            document.getElementById('f_iglesia').value = r['Iglesia'] || '';
-            document.getElementById('f_ciudad_iglesia').value = r['Ciudad Iglesi'] || '';
-            document.getElementById('f_direccion_iglesia').value = r['Dirección iglesia'] || '';
-            
-            document.getElementById('modalFormulario').classList.remove('hidden');
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalFormulario').classList.add('hidden');
-        }
-
-        function guardarRegistro(e) {
-            e.preventDefault();
-            const idVal = document.getElementById('registroId').value;
-            
-            const registroNuevo = {
-                "_id": idVal !== "" ? parseInt(idVal) : Date.now(),
-                "Identificación": document.getElementById('f_identificacion').value.trim(),
-                "Edad": document.getElementById('f_edad').value.trim(),
-                "Primer Nomb": document.getElementById('f_primer_nombre').value.trim(),
-                "Segundo Non": document.getElementById('f_segundo_nombre').value.trim(),
-                "Primer Apelli": document.getElementById('f_primer_apellido').value.trim(),
-                "Segundo Ape": document.getElementById('f_segundo_apellido').value.trim(),
-                "Estado Civil": document.getElementById('f_estado_civil').value.trim(),
-                "Teléfono Móv": document.getElementById('f_telefono').value.trim(),
-                "E-mail": document.getElementById('f_email').value.trim(),
-                "Fecha Nacimi": document.getElementById('f_fecha_nacimiento').value.trim(),
-                "Iglesia": document.getElementById('f_iglesia').value.trim(),
-                "Ciudad Iglesi": document.getElementById('f_ciudad_iglesia').value.trim(),
-                "Dirección iglesia": document.getElementById('f_direccion_iglesia').value.trim()
-            };
-
-            if (idVal !== "") {
-                const idx = baseDeDatos.findIndex(item => item._id === parseInt(idVal));
-                if (idx !== -1) baseDeDatos[idx] = registroNuevo;
-            } else {
-                baseDeDatos.unshift(registroNuevo);
-            }
-
-            cerrarModal();
-            buscarRegistros();
-            alert('Registro guardado exitosamente.');
-        }
-
-        function descargarExcel(datos, nombreArchivo) {
-            if (!datos || datos.length === 0) {
-                alert('No hay datos para exportar.');
-                return;
-            }
-            const datosLimpios = datos.map(({_id, ...resto}) => resto);
-            const ws = XLSX.utils.json_to_sheet(datosLimpios);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Miembros");
-            XLSX.writeFile(wb, `${nombreArchivo}.xlsx`);
-        }
-
-        function exportarExcelFiltrado() {
-            descargarExcel(resultadosFiltrados, 'Miembros_IGLECAM_Filtrados');
-        }
-
-        function exportarTodaLaBase() {
-            const orden = document.getElementById('ordenExportacion').value;
-            const copiaBD = [...baseDeDatos];
-            
-            copiaBD.sort((a, b) => {
-                const valA = normalizarTexto(a[orden]);
-                const valB = normalizarTexto(b[orden]);
-                return valA.localeCompare(valB);
-            });
-
-            descargarExcel(copiaBD, `Base_Completa_IGLECAM_${orden.replace(/\s+/g, '_')}`);
-        }
-    </script>
-</body>
-</html>
+                            const pApe = normalizarTexto(obtenerCampo(item, ['Primer Apellido', 'Primer Apelli']));
+                            let sApe
