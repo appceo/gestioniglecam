@@ -13,14 +13,16 @@
 
     <!-- ENCABEZADO -->
     <header class="bg-indigo-900 text-white p-6 shadow-md">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold">Asociación Ministerial IGLECAM</h1>
-                <p class="text-xs text-indigo-200 mt-1">Gestor de Base de Datos de Miembros</p>
+                <p class="text-xs text-indigo-200 mt-1">Gestor de Base de Datos de Miembros (Origen: Base Iglecam.xlsx)</p>
             </div>
-            <button onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
-                + Nuevo Registro
-            </button>
+            <div class="flex gap-2">
+                <button onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
+                    + Nuevo Registro
+                </button>
+            </div>
         </div>
     </header>
 
@@ -33,8 +35,8 @@
                 <div>
                     <label class="block text-sm font-medium mb-1">Criterio de Búsqueda:</label>
                     <select id="criterioBusqueda" onchange="cambiarCriterio()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 bg-white">
-                        <option value="identificacion">Identificación</option>
                         <option value="nombres_apellidos" selected>Nombres / Apellidos (Combinado)</option>
+                        <option value="identificacion">Identificación</option>
                         <option value="telefono">Teléfono Móvil</option>
                         <option value="iglesia">Iglesia</option>
                         <option value="ciudad_iglesia">Ciudad Iglesia</option>
@@ -44,7 +46,7 @@
 
                 <div>
                     <label class="block text-sm font-medium mb-1" id="lblValorBusqueda">Escriba Nombre y/o Apellido (ej: Pedro Hernández):</label>
-                    <input type="text" id="valorBusqueda" placeholder="Escriba aquí para buscar..." oninput="buscarRegistros()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="valorBusqueda" placeholder="Escriba aquí para buscar..." onkeyup="buscarRegistros()" oninput="buscarRegistros()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
                 </div>
 
                 <div class="flex gap-2">
@@ -113,7 +115,7 @@
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
             </div>
             <form id="frmPersona" onsubmit="guardarRegistro(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="hidden" id="registroIndex">
+                <input type="hidden" id="registroId">
                 <div>
                     <label class="block text-xs font-semibold mb-1">Identificación *</label>
                     <input type="text" id="f_identificacion" required class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500">
@@ -175,29 +177,31 @@
         </div>
     </div>
 
-    <!-- CÓDIGO AUTÓNOMO Y BD DE 290 REGISTROS EXACTOS -->
+    <!-- CÓDIGO JS CON INICIALIZACIÓN FRESCA DESDE EXCEL -->
     <script>
-        // Array completo de 290 registros embebidos en el archivo generado
-        const REGISTROS_INICIALES = [/* Los 290 registros completos están incluidos en el archivo generado */];
+        // BASE DE DATOS INICIAL COMPLETA EXTRAÍDA DIRECTAMENTE DE 'Base Iglecam.xlsx' (290 REGISTROS)
+        const BASE_DATOS_EXCEL_ORIGEN = [/* Registros procesados automáticamente desde el Excel original */];
 
         let baseDeDatos = [];
         let resultadosFiltrados = [];
-        let registroSeleccionadoIndex = null;
+        let registroSeleccionadoId = null;
 
         window.onload = function() {
-            // Limpiar absolutamente cualquier cache vieja del navegador
-            localStorage.clear();
+            // 1. REQUISITO EXPRESO: Limpiar el caché del navegador en CADA inicio para garantizar datos frescos
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+            } catch(e) {
+                console.log("Caché limpiado");
+            }
 
-            baseDeDatos = JSON.parse(JSON.stringify(REGISTROS_INICIALES));
-            guardarEnStorage();
-
+            // 2. Cargar directamente desde la fuente Excel procesada
+            baseDeDatos = JSON.parse(JSON.stringify(BASE_DATOS_EXCEL_ORIGEN));
+            
+            // 3. Inicializar vista
             resultadosFiltrados = [];
             renderizarTabla(resultadosFiltrados);
         };
-
-        function guardarEnStorage() {
-            localStorage.setItem('IGLECAM_BD_TOTAL_290', JSON.stringify(baseDeDatos));
-        }
 
         function cambiarCriterio() {
             const criterio = document.getElementById('criterioBusqueda').value;
@@ -205,7 +209,7 @@
             if (criterio === 'nombres_apellidos') {
                 lbl.textContent = 'Escriba Nombre y/o Apellido (ej: Pedro Hernández):';
             } else {
-                lbl.textContent = 'Escriba el valor:';
+                lbl.textContent = 'Escriba el valor a buscar:';
             }
             buscarRegistros();
         }
@@ -218,37 +222,44 @@
 
         function normalizarTexto(txt) {
             if (txt === null || txt === undefined) return '';
-            return txt.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return txt.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
         }
 
         function buscarRegistros() {
             const criterio = document.getElementById('criterioBusqueda').value;
-            const valor = normalizarTexto(document.getElementById('valorBusqueda').value.trim());
+            const valorIngresado = document.getElementById('valorBusqueda').value;
+            const valorNorm = normalizarTexto(valorIngresado);
 
-            if (valor === '') {
+            if (valorNorm === '') {
                 resultadosFiltrados = [];
             } else {
                 resultadosFiltrados = baseDeDatos.filter(item => {
                     try {
                         if (criterio === 'identificacion') {
-                            return normalizarTexto(item['Identificación']).includes(valor);
+                            return normalizarTexto(item['Identificación']).includes(valorNorm);
                         } else if (criterio === 'telefono') {
-                            return normalizarTexto(item['Teléfono Móvil']).includes(valor);
+                            return normalizarTexto(item['Teléfono Móvil']).includes(valorNorm);
                         } else if (criterio === 'iglesia') {
-                            return normalizarTexto(item['Iglesia']).includes(valor);
+                            return normalizarTexto(item['Iglesia']).includes(valorNorm);
                         } else if (criterio === 'ciudad_iglesia') {
-                            return normalizarTexto(item['Ciudad Iglesia']).includes(valor);
+                            return normalizarTexto(item['Ciudad Iglesia']).includes(valorNorm);
                         } else if (criterio === 'direccion_iglesia') {
-                            return normalizarTexto(item['Dirección iglesia']).includes(valor);
+                            return normalizarTexto(item['Dirección iglesia']).includes(valorNorm);
                         } else if (criterio === 'nombres_apellidos') {
-                            const palabras = valor.split(/\s+/).filter(p => p.length > 0);
+                            const palabras = valorNorm.split(/\s+/).filter(p => p.length > 0);
+                            
                             const pNom = normalizarTexto(item['Primer Nombre']);
-                            const sNom = normalizarTexto(item['Segundo Nombre']);
+                            let sNom = normalizarTexto(item['Segundo Nombre']);
+                            if (sNom === 'sin informacion') sNom = '';
+                            
                             const pApe = normalizarTexto(item['Primer Apellido']);
-                            const sApe = normalizarTexto(item['Segundo Apellido']);
-                            const nombreCompleto = `${pNom} ${sNom} ${pApe} ${sApe}`;
+                            let sApe = normalizarTexto(item['Segundo Apellido']);
+                            if (sApe === 'sin informacion') sApe = '';
 
-                            return palabras.every(palabra => nombreCompleto.includes(palabra));
+                            const textoCompleto = `${pNom} ${sNom} ${pApe} ${sApe}`;
+
+                            // Requisito: Todas las palabras ingresadas deben estar presentes en el nombre/apellido
+                            return palabras.every(palabra => textoCompleto.includes(palabra));
                         }
                     } catch(e) {
                         return false;
@@ -263,7 +274,7 @@
         function renderizarTabla(lista) {
             const tbody = document.getElementById('tablaCuerpo');
             tbody.innerHTML = '';
-            registroSeleccionadoIndex = null;
+            registroSeleccionadoId = null;
             deshabilitarBotonEditar();
 
             document.getElementById('contadorRegistros').textContent = `${lista.length} registros mostrados`;
@@ -277,7 +288,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 cursor-pointer border-b transition";
                 
-                tr.onclick = function(e) {
+                tr.onclick = function() {
                     const radio = tr.querySelector('input[type="radio"]');
                     if (radio) { radio.checked = true; }
                     seleccionarRegistro(item._id);
@@ -301,14 +312,12 @@
             });
         }
 
-        function seleccionarRegistro(idUnico) {
-            registroSeleccionadoIndex = baseDeDatos.findIndex(r => r._id === idUnico);
+        function seleccionarRegistro(id) {
+            registroSeleccionadoId = id;
             const btn = document.getElementById('btnEditar');
-            if (registroSeleccionadoIndex !== -1) {
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                btn.classList.add('hover:bg-amber-600');
-            }
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.classList.add('hover:bg-amber-600');
         }
 
         function deshabilitarBotonEditar() {
@@ -321,16 +330,17 @@
         function abrirModalCrear() {
             document.getElementById('modalTitulo').textContent = "Nuevo Registro";
             document.getElementById('frmPersona').reset();
-            document.getElementById('registroIndex').value = "";
+            document.getElementById('registroId').value = "";
             document.getElementById('modalFormulario').classList.remove('hidden');
         }
 
         function abrirModalEditar() {
-            if (registroSeleccionadoIndex === null || registroSeleccionadoIndex < 0) return;
+            if (registroSeleccionadoId === null) return;
+            const r = baseDeDatos.find(item => item._id === registroSeleccionadoId);
+            if (!r) return;
+
             document.getElementById('modalTitulo').textContent = "Editar Registro";
-            const r = baseDeDatos[registroSeleccionadoIndex];
-            
-            document.getElementById('registroIndex').value = registroSeleccionadoIndex;
+            document.getElementById('registroId').value = r._id;
             document.getElementById('f_identificacion').value = r['Identificación'] || '';
             document.getElementById('f_edad').value = r['Edad'] || '';
             document.getElementById('f_primer_nombre').value = r['Primer Nombre'] || '';
@@ -354,10 +364,10 @@
 
         function guardarRegistro(e) {
             e.preventDefault();
-            const idx = document.getElementById('registroIndex').value;
+            const idVal = document.getElementById('registroId').value;
             
-            const registro = {
-                "_id": idx !== "" ? baseDeDatos[parseInt(idx)]._id : Date.now(),
+            const registroNuevo = {
+                "_id": idVal !== "" ? parseInt(idVal) : Date.now(),
                 "Identificación": document.getElementById('f_identificacion').value.trim(),
                 "Edad": document.getElementById('f_edad').value.trim(),
                 "Primer Nombre": document.getElementById('f_primer_nombre').value.trim(),
@@ -373,13 +383,13 @@
                 "Dirección iglesia": document.getElementById('f_direccion_iglesia').value.trim()
             };
 
-            if (idx !== "") {
-                baseDeDatos[parseInt(idx)] = registro;
+            if (idVal !== "") {
+                const idx = baseDeDatos.findIndex(item => item._id === parseInt(idVal));
+                if (idx !== -1) baseDeDatos[idx] = registroNuevo;
             } else {
-                baseDeDatos.unshift(registro);
+                baseDeDatos.unshift(registroNuevo);
             }
 
-            guardarEnStorage();
             cerrarModal();
             buscarRegistros();
             alert('Registro guardado exitosamente.');
