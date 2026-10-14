@@ -175,46 +175,37 @@
         </div>
     </div>
 
-    <!-- CARGA DE DATOS ORIGINALES (290 REGISTROS) Y LÓGICA -->
+    <!-- REGISTROS EMBEBIDOS (290) Y MOTOR DE BÚSQUEDA AUTÓNOMO -->
     <script>
+        const REGISTROS_INICIALES = [{"_id": 0, "Identificación": "28822382", "Edad": "21 Años", "Primer Nombre": "Diana", "Segundo Nombre": "", "Primer Apellido": "Castro", "Segundo Apellido": "", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "cdiana529@gmail.com", "Fecha Nacimiento": "2005-10-05", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 1, "Identificación": "1014227431", "Edad": "34 Años", "Primer Nombre": "Gian", "Segundo Nombre": "Carlos", "Primer Apellido": "Jiménez", "Segundo Apellido": "Ramos", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "giancarlojimenez84@gmail.com", "Fecha Nacimiento": "1991-11-20", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 2, "Identificación": "19454490", "Edad": "20 Años", "Primer Nombre": "Alirio", "Segundo Nombre": "", "Primer Apellido": "Mahecha", "Segundo Apellido": "Acero", "Estado Civil": "Divorciado", "Teléfono Móvil": "57", "E-mail": "alimahechacero@gmail.com", "Fecha Nacimiento": "2005-11-21", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 3, "Identificación": "1020736388", "Edad": "37 Años", "Primer Nombre": "Katherine", "Segundo Nombre": "", "Primer Apellido": "Said", "Segundo Apellido": "Fierro", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002091933", "E-mail": "katiesaidf@gmail.com", "Fecha Nacimiento": "1988-11-05", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 4, "Identificación": "51953184", "Edad": "58 Años", "Primer Nombre": "Sonia", "Segundo Nombre": "Liliana", "Primer Apellido": "Oviedo", "Segundo Apellido": "Repizo", "Estado Civil": "Casado Por La Iglesia", "Teléfono Móvil": "3002141074", "E-mail": "soliore68@gmail.com", "Fecha Nacimiento": "1968-07-21", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 184, "Identificación": "79687830", "Edad": "51 Años", "Primer Nombre": "Javier", "Segundo Nombre": "Eduardo", "Primer Apellido": "Aponte", "Segundo Apellido": "Rodríguez", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3203465039", "E-mail": "admin@iglesiaencasa.co", "Fecha Nacimiento": "1975-07-26", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}];
+
         let baseDeDatos = [];
         let resultadosFiltrados = [];
         let registroSeleccionadoIndex = null;
 
         window.onload = function() {
-            // Limpiar versiones anteriores de prueba si existen
-            localStorage.removeItem('IGLECAM_BD_V2');
+            // Carga garantizada de datos desde localStorage o la lista embebida
+            localStorage.removeItem('IGLECAM_BD_FINAL');
+            const guardado = localStorage.getItem('IGLECAM_BD_PROD');
             
-            const guardado = localStorage.getItem('IGLECAM_BD_FINAL');
             if (guardado) {
                 try {
                     baseDeDatos = JSON.parse(guardado);
                 } catch(e) {
-                    cargarBaseCompletaOriginal();
+                    baseDeDatos = [...REGISTROS_INICIALES];
                 }
             } else {
-                cargarBaseCompletaOriginal();
+                baseDeDatos = [...REGISTROS_INICIALES];
+                guardarEnStorage();
             }
-            // Iniciar con la tabla vacía
+
+            // Iniciar limpia (0 registros mostrados)
             resultadosFiltrados = [];
             renderizarTabla(resultadosFiltrados);
         };
 
-        function cargarBaseCompletaOriginal() {
-            // Se realiza la carga inicial de los 290 registros desde la fuente Excel
-            fetch('base_datos_completa.json')
-                .then(response => response.json())
-                .then(data => {
-                    baseDeDatos = data;
-                    guardarEnStorage();
-                })
-                .catch(err => {
-                    console.error("Cargando BD respaldada...");
-                });
-        }
-
         function guardarEnStorage() {
-            localStorage.setItem('IGLECAM_BD_FINAL', JSON.stringify(baseDeDatos));
+            localStorage.setItem('IGLECAM_BD_PROD', JSON.stringify(baseDeDatos));
         }
 
         function cambiarCriterio() {
@@ -244,7 +235,6 @@
             const valor = normalizarTexto(document.getElementById('valorBusqueda').value.trim());
 
             if (valor === '') {
-                // Si el campo de búsqueda está vacío, mostrar 0 registros
                 resultadosFiltrados = [];
             } else {
                 resultadosFiltrados = baseDeDatos.filter(item => {
