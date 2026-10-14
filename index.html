@@ -8,15 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS CDN para Exportación a Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
+    <!-- ENCABEZADO -->
     <header class="bg-indigo-900 text-white p-6 shadow-md">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Asociación Ministerial IGLECAM</h1>
-            <button onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
+            <div>
+                <h1 class="text-2xl font-bold">Asociación Ministerial IGLECAM</h1>
+                <p class="text-xs text-indigo-200 mt-1">Gestor de Base de Datos de Miembros</p>
+            </div>
+            <button onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
                 + Nuevo Registro
             </button>
         </div>
@@ -30,9 +32,9 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
                     <label class="block text-sm font-medium mb-1">Criterio de Búsqueda:</label>
-                    <select id="criterioBusqueda" onchange="cambiarCriterio()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
+                    <select id="criterioBusqueda" onchange="cambiarCriterio()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 bg-white">
                         <option value="identificacion">Identificación</option>
-                        <option value="nombres_apellidos">Nombres / Apellidos (Combinado)</option>
+                        <option value="nombres_apellidos" selected>Nombres / Apellidos (Combinado)</option>
                         <option value="telefono">Teléfono Móvil</option>
                         <option value="iglesia">Iglesia</option>
                         <option value="ciudad_iglesia">Ciudad Iglesia</option>
@@ -41,41 +43,44 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1" id="lblValorBusqueda">Escriba el valor:</label>
-                    <input type="text" id="valorBusqueda" placeholder="Buscar..." onkeyup="if(event.key==='Enter') buscarRegistros()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
+                    <label class="block text-sm font-medium mb-1" id="lblValorBusqueda">Escriba Nombre y/o Apellido (ej: Pedro Hernández):</label>
+                    <input type="text" id="valorBusqueda" placeholder="Escriba aquí para buscar..." onkeyup="if(event.key==='Enter') buscarRegistros()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
                 </div>
 
                 <div class="flex gap-2">
-                    <button onclick="buscarRegistros()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex-1 font-medium">
+                    <button onclick="buscarRegistros()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
                         Buscar
                     </button>
-                    <button onclick="exportarExcelFiltrado()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex-1 font-medium">
+                    <button onclick="exportarExcelFiltrado()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
                         Descargar Filtrados (.xlsx)
                     </button>
                 </div>
             </div>
+            <div class="mt-2 flex justify-end">
+                <button onclick="limpiarBusqueda()" class="text-xs text-indigo-600 hover:underline">Restablecer Búsqueda (Ver Todos)</button>
+            </div>
         </section>
 
-        <!-- DESCARGA COMPLETA -->
-        <section class="mb-6 flex justify-between items-center bg-indigo-50 p-4 rounded-lg">
+        <!-- DESCARGA DE TODA LA BD -->
+        <section class="mb-6 flex flex-col md:flex-row justify-between items-center bg-indigo-50 p-4 rounded-lg gap-4">
             <div class="flex items-center gap-4">
-                <span class="text-sm font-semibold">Descargar Toda la Base de Datos ordenada por:</span>
-                <select id="ordenExportacion" class="border border-slate-300 rounded-lg p-1 text-sm">
-                    <option value="primer_apellido">Primer Apellido</option>
-                    <option value="ciudad_iglesia">Ciudad Iglesia</option>
+                <span class="text-sm font-semibold text-indigo-950">Descargar Toda la Base de Datos ordenada por:</span>
+                <select id="ordenExportacion" class="border border-slate-300 rounded-lg p-1.5 text-sm bg-white">
+                    <option value="Primer Apellido">Primer Apellido</option>
+                    <option value="Ciudad Iglesia">Ciudad Iglesia</option>
                 </select>
             </div>
-            <button onclick="exportarTodaLaBase()" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            <button onclick="exportarTodaLaBase()" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                 Descargar Toda la BD (.xlsx)
             </button>
         </section>
 
         <!-- TABLA DE RESULTADOS -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
             <table class="w-full text-left text-sm border-collapse">
                 <thead>
-                    <tr class="bg-slate-200 text-slate-700">
-                        <th class="p-3">Seleccionar</th>
+                    <tr class="bg-slate-200 text-slate-700 border-b border-slate-300">
+                        <th class="p-3 w-12 text-center">Sel.</th>
                         <th class="p-3">Identificación</th>
                         <th class="p-3">Nombres</th>
                         <th class="p-3">Apellidos</th>
@@ -86,36 +91,39 @@
                         <th class="p-3">Dirección Iglesia</th>
                     </tr>
                 </thead>
-                <tbody id="tablaCuerpo" class="divide-y divide-slate-200">
+                <tbody id="tablaCuerpo" class="divide-y divide-slate-200 bg-white">
                     <!-- Filas dinámicas -->
                 </tbody>
             </table>
         </div>
 
-        <div class="mt-4 flex justify-between items-center">
-            <span id="contadorRegistros" class="text-sm text-slate-500">0 registros mostrados</span>
-            <button id="btnEditar" onclick="abrirModalEditar()" disabled class="bg-amber-500 opacity-50 cursor-not-allowed text-white font-semibold px-4 py-2 rounded-lg">
+        <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <span id="contadorRegistros" class="text-sm font-medium text-slate-600">0 registros mostrados</span>
+            <button id="btnEditar" onclick="abrirModalEditar()" disabled class="bg-amber-500 opacity-50 cursor-not-allowed text-white font-semibold px-5 py-2 rounded-lg shadow transition">
                 Editar Registro Seleccionado
             </button>
         </div>
     </main>
 
-    <!-- MODAL FORMULARIO -->
+    <!-- MODAL DE CREACIÓN Y EDICIÓN -->
     <div id="modalFormulario" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <h3 id="modalTitulo" class="text-xl font-bold mb-4 text-indigo-900">Nuevo Registro</h3>
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 id="modalTitulo" class="text-xl font-bold text-indigo-900">Nuevo Registro</h3>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+            </div>
             <form id="frmPersona" onsubmit="guardarRegistro(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="hidden" id="registroId">
+                <input type="hidden" id="registroIndex">
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Identificación</label>
-                    <input type="number" id="f_identificacion" required class="w-full border p-2 rounded">
+                    <label class="block text-xs font-semibold mb-1">Identificación *</label>
+                    <input type="text" id="f_identificacion" required class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold mb-1">Edad</label>
                     <input type="text" id="f_edad" class="w-full border p-2 rounded" placeholder="ej. 30 Años">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Primer Nombre</label>
+                    <label class="block text-xs font-semibold mb-1">Primer Nombre *</label>
                     <input type="text" id="f_primer_nombre" required class="w-full border p-2 rounded">
                 </div>
                 <div>
@@ -123,7 +131,7 @@
                     <input type="text" id="f_segundo_nombre" class="w-full border p-2 rounded">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Primer Apellido</label>
+                    <label class="block text-xs font-semibold mb-1">Primer Apellido *</label>
                     <input type="text" id="f_primer_apellido" required class="w-full border p-2 rounded">
                 </div>
                 <div>
@@ -144,7 +152,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold mb-1">Fecha Nacimiento</label>
-                    <input type="date" id="f_fecha_nacimiento" class="w-full border p-2 rounded">
+                    <input type="text" id="f_fecha_nacimiento" placeholder="AAAA-MM-DD" class="w-full border p-2 rounded">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold mb-1">Iglesia</label>
@@ -159,107 +167,139 @@
                     <input type="text" id="f_direccion_iglesia" class="w-full border p-2 rounded">
                 </div>
 
-                <div class="md:col-span-2 flex justify-end gap-2 mt-4">
-                    <button type="button" onclick="cerrarModal()" class="bg-slate-300 text-slate-700 px-4 py-2 rounded">Cancelar</button>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold">Guardar</button>
+                <div class="md:col-span-2 flex justify-end gap-2 mt-4 border-t pt-4">
+                    <button type="button" onclick="cerrarModal()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-4 py-2 rounded">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded font-semibold">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- SCRIPT DE JAVASCRIPT CORRECTAMENTE COLOCADO -->
+    <!-- LOGICA AUTÓNOMA Y PERSISTENTE -->
     <script>
-        // CONFIGURACIÓN DE SUPABASE (Reemplazar con tus credenciales reales)
-        const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
-        const SUPABASE_KEY = 'TU-ANON-KEY-DE-SUPABASE';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Muestra inicial de datos cargados automáticamente
+        let baseDeDatos = [];
+        let resultadosFiltrados = [];
+        let registroSeleccionadoIndex = null;
 
-        let resultadosActuales = [];
-        let registroSeleccionado = null;
+        // Carga o inicializa la BD desde localStorage
+        window.onload = function() {
+            const guardado = localStorage.getItem('IGLECAM_BD_V2');
+            if (guardado) {
+                baseDeDatos = JSON.parse(guardado);
+            } else {
+                // Carga inicial con los datos base
+                baseDeDatos = [
+                    {"Identificación": "28822382", "Edad": "21 Años", "Primer Nombre": "Diana", "Segundo Nombre": "Sin Información", "Primer Apellido": "Castro", "Segundo Apellido": "Sin Información", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "cdiana529@gmail.com", "Fecha Nacimiento": "2005-10-05", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""},
+                    {"Identificación": "1014227431", "Edad": "34 Años", "Primer Nombre": "Gian", "Segundo Nombre": "Carlos", "Primer Apellido": "Jiménez", "Segundo Apellido": "Ramos", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "giancarlojimenez84@gmail.com", "Fecha Nacimiento": "1991-11-20", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""},
+                    {"Identificación": "79687830", "Edad": "45 Años", "Primer Nombre": "Javier", "Segundo Nombre": "Eduardo", "Primer Apellido": "Aponte", "Segundo Apellido": "Rodríguez", "Estado Civil": "Casado Por La Iglesia", "Teléfono Móvil": "3101234567", "E-mail": "japonte@gmail.com", "Fecha Nacimiento": "1979-05-12", "Iglesia": "Central", "Ciudad Iglesia": "Bogotá", "Dirección iglesia": "Calle 100"},
+                    {"Identificación": "19454490", "Edad": "20 Años", "Primer Nombre": "Alirio", "Segundo Nombre": "Sin Información", "Primer Apellido": "Mahecha", "Segundo Apellido": "Acero", "Estado Civil": "Divorciado", "Teléfono Móvil": "57", "E-mail": "alimahechacero@gmail.com", "Fecha Nacimiento": "2005-11-21", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""},
+                    {"Identificación": "1020736388", "Edad": "37 Años", "Primer Nombre": "Katherine", "Segundo Nombre": "Sin Información", "Primer Apellido": "Said", "Segundo Apellido": "Fierro", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002091933", "E-mail": "katiesaidf@gmail.com", "Fecha Nacimiento": "1988-11-05", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""},
+                    {"Identificación": "51953184", "Edad": "58 Años", "Primer Nombre": "Sonia", "Segundo Nombre": "Liliana", "Primer Apellido": "Oviedo", "Segundo Apellido": "Repizo", "Estado Civil": "Casado Por La Iglesia", "Teléfono Móvil": "3002141074", "E-mail": "soliore68@gmail.com", "Fecha Nacimiento": "1968-07-21", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}
+                ];
+                guardarEnStorage();
+            }
+            buscarRegistros();
+        };
 
-        window.onload = () => buscarRegistros();
+        function guardarEnStorage() {
+            localStorage.setItem('IGLECAM_BD_V2', JSON.stringify(baseDeDatos));
+        }
 
         function cambiarCriterio() {
             const criterio = document.getElementById('criterioBusqueda').value;
             const lbl = document.getElementById('lblValorBusqueda');
             if (criterio === 'nombres_apellidos') {
-                lbl.textContent = 'Escriba Nombre y/o Apellido (ej: Javier Aponte):';
+                lbl.textContent = 'Escriba Nombre y/o Apellido (ej: Pedro Hernández):';
             } else {
                 lbl.textContent = 'Escriba el valor:';
             }
         }
 
-        async function buscarRegistros() {
+        function limpiarBusqueda() {
+            document.getElementById('valorBusqueda').value = '';
+            buscarRegistros();
+        }
+
+        function normalizarTexto(txt) {
+            if (!txt) return '';
+            return txt.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function buscarRegistros() {
             const criterio = document.getElementById('criterioBusqueda').value;
-            const valor = document.getElementById('valorBusqueda').value.trim();
+            const valor = normalizarTexto(document.getElementById('valorBusqueda').value.trim());
 
-            let query = supabase.from('miembros').select('*');
-
-            if (valor !== '') {
-                if (criterio === 'identificacion') {
-                    query = query.or(`identificacion.eq.${valor},identificacion.ilike.%${valor}%`);
-                } else if (criterio === 'telefono') {
-                    query = query.ilike('telefono_movil', `%${valor}%`);
-                } else if (criterio === 'iglesia') {
-                    query = query.ilike('iglesia', `%${valor}%`);
-                } else if (criterio === 'ciudad_iglesia') {
-                    query = query.ilike('ciudad_iglesia', `%${valor}%`);
-                } else if (criterio === 'direccion_iglesia') {
-                    query = query.ilike('direccion_iglesia', `%${valor}%`);
-                } else if (criterio === 'nombres_apellidos') {
-                    const palabras = valor.split(/\s+/).filter(p => p.length > 0);
-                    let condiciones = [];
-                    
-                    palabras.forEach(p => {
-                        condiciones.push(`primer_nombre.ilike.%${p}%`);
-                        condiciones.push(`segundo_nombre.ilike.%${p}%`);
-                        condiciones.push(`primer_apellido.ilike.%${p}%`);
-                        condiciones.push(`segundo_apellido.ilike.%${p}%`);
-                    });
-
-                    query = query.or(condiciones.join(','));
-                }
+            if (valor === '') {
+                resultadosFiltrados = [...baseDeDatos];
+            } else {
+                resultadosFiltrados = baseDeDatos.filter(item => {
+                    if (criterio === 'identificacion') {
+                        return normalizarTexto(item['Identificación']).includes(valor);
+                    } else if (criterio === 'telefono') {
+                        return normalizarTexto(item['Teléfono Móvil']).includes(valor);
+                    } else if (criterio === 'iglesia') {
+                        return normalizarTexto(item['Iglesia']).includes(valor);
+                    } else if (criterio === 'ciudad_iglesia') {
+                        return normalizarTexto(item['Ciudad Iglesia']).includes(valor);
+                    } else if (criterio === 'direccion_iglesia') {
+                        return normalizarTexto(item['Dirección iglesia']).includes(valor);
+                    } else if (criterio === 'nombres_apellidos') {
+                        const palabras = valor.split(/\s+/).filter(p => p.length > 0);
+                        const campoNombre = normalizarTexto(`${item['Primer Nombre']} ${item['Segundo Nombre']} ${item['Primer Apellido']} ${item['Segundo Apellido']}`);
+                        return palabras.every(palabra => campoNombre.includes(palabra));
+                    }
+                    return false;
+                });
             }
 
-            const { data, error } = await query;
-            if (error) {
-                console.error("Error al consultar:", error);
-                alert('Error al consultar datos: ' + error.message);
-                return;
-            }
-
-            resultadosActuales = data || [];
-            renderizarTabla(resultadosActuales);
+            renderizarTabla(resultadosFiltrados);
         }
 
         function renderizarTabla(lista) {
             const tbody = document.getElementById('tablaCuerpo');
             tbody.innerHTML = '';
-            registroSeleccionado = null;
+            registroSeleccionadoIndex = null;
             deshabilitarBotonEditar();
 
             document.getElementById('contadorRegistros').textContent = `${lista.length} registros mostrados`;
 
+            if (lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500 font-medium">No se encontraron registros con los criterios especificados.</td></tr>`;
+                return;
+            }
+
             lista.forEach((item) => {
+                // Encontrar el índice real dentro de baseDeDatos
+                const realIndex = baseDeDatos.findIndex(orig => orig['Identificación'] === item['Identificación'] && orig['Primer Nombre'] === item['Primer Nombre']);
+                
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 cursor-pointer";
+                tr.className = "hover:bg-slate-50 cursor-pointer border-b transition";
+                tr.onclick = function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const radio = tr.querySelector('input[type="radio"]');
+                        if (radio) { radio.checked = true; }
+                    }
+                    seleccionarRegistro(realIndex);
+                };
+
                 tr.innerHTML = `
-                    <td class="p-3"><input type="radio" name="selRegistro" onclick='seleccionarRegistro(${JSON.stringify(item)})'></td>
-                    <td class="p-3">${item.identificacion || ''}</td>
-                    <td class="p-3">${item.primer_nombre || ''} ${item.segundo_nombre || ''}</td>
-                    <td class="p-3">${item.primer_apellido || ''} ${item.segundo_apellido || ''}</td>
-                    <td class="p-3">${item.telefono_movil || ''}</td>
-                    <td class="p-3">${item.email || ''}</td>
-                    <td class="p-3">${item.iglesia || ''}</td>
-                    <td class="p-3">${item.ciudad_iglesia || ''}</td>
-                    <td class="p-3">${item.direccion_iglesia || ''}</td>
+                    <td class="p-3 text-center"><input type="radio" name="selRegistro" value="${realIndex}"></td>
+                    <td class="p-3 font-semibold text-slate-800">${item['Identificación'] || ''}</td>
+                    <td class="p-3">${item['Primer Nombre'] || ''} ${(item['Segundo Nombre'] && item['Segundo Nombre'] !== 'Sin Información') ? item['Segundo Nombre'] : ''}</td>
+                    <td class="p-3">${item['Primer Apellido'] || ''} ${(item['Segundo Apellido'] && item['Segundo Apellido'] !== 'Sin Información') ? item['Segundo Apellido'] : ''}</td>
+                    <td class="p-3">${item['Teléfono Móvil'] || ''}</td>
+                    <td class="p-3 text-slate-600">${item['E-mail'] || ''}</td>
+                    <td class="p-3">${item['Iglesia'] || '-'}</td>
+                    <td class="p-3">${item['Ciudad Iglesia'] || '-'}</td>
+                    <td class="p-3">${item['Dirección iglesia'] || '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function seleccionarRegistro(item) {
-            registroSeleccionado = item;
+        function seleccionarRegistro(idx) {
+            registroSeleccionadoIndex = idx;
             const btn = document.getElementById('btnEditar');
             btn.disabled = false;
             btn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -276,28 +316,29 @@
         function abrirModalCrear() {
             document.getElementById('modalTitulo').textContent = "Nuevo Registro";
             document.getElementById('frmPersona').reset();
-            document.getElementById('registroId').value = "";
+            document.getElementById('registroIndex').value = "";
             document.getElementById('modalFormulario').classList.remove('hidden');
         }
 
         function abrirModalEditar() {
-            if (!registroSeleccionado) return;
+            if (registroSeleccionadoIndex === null || registroSeleccionadoIndex < 0) return;
             document.getElementById('modalTitulo').textContent = "Editar Registro";
-            const r = registroSeleccionado;
-            document.getElementById('registroId').value = r.id;
-            document.getElementById('f_identificacion').value = r.identificacion || '';
-            document.getElementById('f_edad').value = r.edad || '';
-            document.getElementById('f_primer_nombre').value = r.primer_nombre || '';
-            document.getElementById('f_segundo_nombre').value = r.segundo_nombre || '';
-            document.getElementById('f_primer_apellido').value = r.primer_apellido || '';
-            document.getElementById('f_segundo_apellido').value = r.segundo_apellido || '';
-            document.getElementById('f_estado_civil').value = r.estado_civil || '';
-            document.getElementById('f_telefono').value = r.telefono_movil || '';
-            document.getElementById('f_email').value = r.email || '';
-            document.getElementById('f_fecha_nacimiento').value = r.fecha_nacimiento || '';
-            document.getElementById('f_iglesia').value = r.iglesia || '';
-            document.getElementById('f_ciudad_iglesia').value = r.ciudad_iglesia || '';
-            document.getElementById('f_direccion_iglesia').value = r.direccion_iglesia || '';
+            const r = baseDeDatos[registroSeleccionadoIndex];
+            
+            document.getElementById('registroIndex').value = registroSeleccionadoIndex;
+            document.getElementById('f_identificacion').value = r['Identificación'] || '';
+            document.getElementById('f_edad').value = r['Edad'] || '';
+            document.getElementById('f_primer_nombre').value = r['Primer Nombre'] || '';
+            document.getElementById('f_segundo_nombre').value = r['Segundo Nombre'] || '';
+            document.getElementById('f_primer_apellido').value = r['Primer Apellido'] || '';
+            document.getElementById('f_segundo_apellido').value = r['Segundo Apellido'] || '';
+            document.getElementById('f_estado_civil').value = r['Estado Civil'] || '';
+            document.getElementById('f_telefono').value = r['Teléfono Móvil'] || '';
+            document.getElementById('f_email').value = r['E-mail'] || '';
+            document.getElementById('f_fecha_nacimiento').value = r['Fecha Nacimiento'] || '';
+            document.getElementById('f_iglesia').value = r['Iglesia'] || '';
+            document.getElementById('f_ciudad_iglesia').value = r['Ciudad Iglesia'] || '';
+            document.getElementById('f_direccion_iglesia').value = r['Dirección iglesia'] || '';
             
             document.getElementById('modalFormulario').classList.remove('hidden');
         }
@@ -306,41 +347,43 @@
             document.getElementById('modalFormulario').classList.add('hidden');
         }
 
-        async function guardarRegistro(e) {
+        function guardarRegistro(e) {
             e.preventDefault();
-            const id = document.getElementById('registroId').value;
-            const payload = {
-                identificacion: document.getElementById('f_identificacion').value,
-                edad: document.getElementById('f_edad').value,
-                primer_nombre: document.getElementById('f_primer_nombre').value,
-                segundo_nombre: document.getElementById('f_segundo_nombre').value,
-                primer_apellido: document.getElementById('f_primer_apellido').value,
-                segundo_apellido: document.getElementById('f_segundo_apellido').value,
-                estado_civil: document.getElementById('f_estado_civil').value,
-                telefono_movil: document.getElementById('f_telefono').value,
-                email: document.getElementById('f_email').value,
-                fecha_nacimiento: document.getElementById('f_fecha_nacimiento').value || null,
-                iglesia: document.getElementById('f_iglesia').value,
-                ciudad_iglesia: document.getElementById('f_ciudad_iglesia').value,
-                direccion_iglesia: document.getElementById('f_direccion_iglesia').value
+            const idx = document.getElementById('registroIndex').value;
+            
+            const registro = {
+                "Identificación": document.getElementById('f_identificacion').value.trim(),
+                "Edad": document.getElementById('f_edad').value.trim(),
+                "Primer Nombre": document.getElementById('f_primer_nombre').value.trim(),
+                "Segundo Nombre": document.getElementById('f_segundo_nombre').value.trim() || 'Sin Información',
+                "Primer Apellido": document.getElementById('f_primer_apellido').value.trim(),
+                "Segundo Apellido": document.getElementById('f_segundo_apellido').value.trim() || 'Sin Información',
+                "Estado Civil": document.getElementById('f_estado_civil').value.trim(),
+                "Teléfono Móvil": document.getElementById('f_telefono').value.trim(),
+                "E-mail": document.getElementById('f_email').value.trim(),
+                "Fecha Nacimiento": document.getElementById('f_fecha_nacimiento').value.trim(),
+                "Iglesia": document.getElementById('f_iglesia').value.trim(),
+                "Ciudad Iglesia": document.getElementById('f_ciudad_iglesia').value.trim(),
+                "Dirección iglesia": document.getElementById('f_direccion_iglesia').value.trim()
             };
 
-            let res;
-            if (id) {
-                res = await supabase.from('miembros').update(payload).eq('id', id);
+            if (idx !== "") {
+                baseDeDatos[parseInt(idx)] = registro;
             } else {
-                res = await supabase.from('miembros').insert([payload]);
+                baseDeDatos.unshift(registro);
             }
 
-            if (res.error) {
-                alert('Error al guardar: ' + res.error.message);
-            } else {
-                cerrarModal();
-                buscarRegistros();
-            }
+            guardarEnStorage();
+            cerrarModal();
+            buscarRegistros();
+            alert('Registro guardado correctamente');
         }
 
         function descargarExcel(datos, nombreArchivo) {
+            if (datos.length === 0) {
+                alert('No hay registros disponibles para descargar');
+                return;
+            }
             const ws = XLSX.utils.json_to_sheet(datos);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Miembros");
@@ -348,22 +391,20 @@
         }
 
         function exportarExcelFiltrado() {
-            if (resultadosActuales.length === 0) {
-                alert('No hay registros para exportar');
-                return;
-            }
-            descargarExcel(resultadosActuales, 'Miembros_Filtrados');
+            descargarExcel(resultadosFiltrados, 'Miembros_IGLECAM_Filtrados');
         }
 
-        async function exportarTodaLaBase() {
+        function exportarTodaLaBase() {
             const orden = document.getElementById('ordenExportacion').value;
-            const { data, error } = await supabase.from('miembros').select('*').order(orden, { ascending: true });
+            const copiaBD = [...baseDeDatos];
             
-            if (error) {
-                alert('Error al obtener la base completa');
-                return;
-            }
-            descargarExcel(data, `Base_Completa_IGLECAM_ordenada_por_${orden}`);
+            copiaBD.sort((a, b) => {
+                const valA = normalizarTexto(a[orden]);
+                const valB = normalizarTexto(b[orden]);
+                return valA.localeCompare(valB);
+            });
+
+            descargarExcel(copiaBD, `Base_Completa_IGLECAM_ordenada_por_${orden.replace(' ', '_')}`);
         }
     </script>
 </body>
