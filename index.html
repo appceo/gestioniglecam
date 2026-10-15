@@ -1,107 +1,35 @@
-/**
- * ============================================================================
- * SISTEMA GESTOR DE BASE DE DATOS DE MIEMBROS - ASOCIACIÓN MINISTERIAL IGLECAM
- * Módulo de Consulta, Normalización de Texto y Filtro de Miembros
- * ============================================================================
- */
-
-// ----------------------------------------------------------------------------
-// 1. FUNCIÓN DE NORMALIZACIÓN DE TEXTO
-// ----------------------------------------------------------------------------
-/**
- * Convierte cualquier cadena a minúsculas, elimina espacios adicionales en los
- * extremos y remueve todos los acentos / diacríticos (ej: "Rodríguez" -> "rodriguez").
- *
- * @param {string} texto - Texto original a normalizar.
- * @returns {string} Texto limpio, en minúsculas y sin tildes.
- */
+// Function de normalización de texto (sin comentarios extensos)
 function normalizarTexto(texto) {
-  if (texto === null || texto === undefined) return "";
+  if (!texto) return "";
   return texto
     .toString()
     .trim()
     .toLowerCase()
-    .normalize("NFD")                  // Separa los caracteres de sus diacríticos
-    .replace(/[\u0300-\u036f]/g, ""); // Remueve las marcas de acento
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
-// ----------------------------------------------------------------------------
-// 2. FUNCIÓN PRINCIPAL DE FILTRADO
-// ----------------------------------------------------------------------------
-/**
- * Filtra una lista de miembros de acuerdo al criterio seleccionado y al término buscado.
- *
- * @param {Array<Object>} miembros - Lista de objetos de miembros desde la BD.
- * @param {string} criterio - Criterio elegido ("combinado", "nombres", "apellidos", "identificacion").
- * @param {string} valorBusqueda - Término de búsqueda escrito por el usuario.
- * @returns {Array<Object>} Lista de miembros que coinciden con la búsqueda.
- */
-function filtrarMiembros(miembros, criterio, valorBusqueda) {
-  // Normalizar el parámetro de entrada del usuario
-  const busquedaLimpia = normalizarTexto(valorBusqueda);
+// Reemplaza únicamente la función de filtrado existente por esta:
+function filtrarMiembros(listaMiembros, criterio, busqueda) {
+  const busquedaLimpia = normalizarTexto(busqueda);
   const criterioLimpio = normalizarTexto(criterio);
 
-  // Si la búsqueda está vacía, devuelve todos los registros
-  if (!busquedaLimpia) {
-    return miembros;
-  }
+  if (!busquedaLimpia) return listaMiembros;
 
-  // Filtrar el array comprobando la coincidencia insensible a tildes/mayúsculas
-  return miembros.filter(miembro => {
-    // Extraer y normalizar los campos del miembro (soporta nombres de clave en minúsculas o mayúsculas)
-    const nombres = normalizarTexto(miembro.nombres || miembro.NOMBRES || "");
-    const apellidos = normalizarTexto(miembro.apellidos || miembro.APELLIDOS || "");
-    const identificacion = normalizarTexto(miembro.identificacion || miembro.IDENTIFICACIÓN || miembro.cedula || "");
+  return listaMiembros.filter(miembro => {
+    const nombres = normalizarTexto(miembro.nombres || miembro.NOMBRES);
+    const apellidos = normalizarTexto(miembro.apellidos || miembro.APELLIDOS);
+    const identificacion = normalizarTexto(miembro.identificacion || miembro.IDENTIFICACIÓN);
 
-    // Evaluar coincidencia según el criterio de búsqueda seleccionado
-    if (criterioLimpio.includes("nombres") && criterioLimpio.includes("apellidos")) {
-      // Criterio: "Nombres / Apellidos (Combinado)"
+    if (criterioLimpio.includes("combinado")) {
       return nombres.includes(busquedaLimpia) || apellidos.includes(busquedaLimpia);
     } else if (criterioLimpio.includes("nombre")) {
-      // Criterio: "Nombres"
       return nombres.includes(busquedaLimpia);
     } else if (criterioLimpio.includes("apellido")) {
-      // Criterio: "Apellidos"
       return apellidos.includes(busquedaLimpia);
-    } else if (criterioLimpio.includes("identifica") || criterioLimpio.includes("cedula")) {
-      // Criterio: "Identificación"
+    } else if (criterioLimpio.includes("identifica")) {
       return identificacion.includes(busquedaLimpia);
-    } else {
-      // Por defecto (Fallback): Busca en nombres o apellidos
-      return nombres.includes(busquedaLimpia) || apellidos.includes(busquedaLimpia);
     }
+    return nombres.includes(busquedaLimpia) || apellidos.includes(busquedaLimpia);
   });
 }
-
-// ----------------------------------------------------------------------------
-// 3. CONEXIÓN CON LA INTERFAZ DE USUARIO (HTML / DOM)
-// ----------------------------------------------------------------------------
-/**
- * Lee los campos del DOM, ejecuta el filtro y actualiza la tabla de la interfaz.
- */
-function ejecutarFiltroInterfaz() {
-  // Elementos de la interfaz (Asegúrate de que los IDs coincidan con tu HTML)
-  const comboCriterio = document.getElementById("criterioBusqueda") || document.getElementById("criterio");
-  const campoBusqueda = document.getElementById("inputBusqueda") || document.getElementById("busqueda");
-  
-  const criterioSeleccionado = comboCriterio ? comboCriterio.value : "Nombres / Apellidos (Combinado)";
-  const textoIngresado = campoBusqueda ? campoBusqueda.value : "";
-
-  // Supongamos que 'bdMiembros' contiene la lista global cargada desde el servidor
-  if (typeof bdMiembros !== "undefined" && Array.isArray(bdMiembros)) {
-    const resultados = filtrarMiembros(bdMiembros, criterioSeleccionado, textoIngresado);
-    
-    // Función encargada de refrescar la tabla HTML
-    if (typeof actualizarTablaResultados === "function") {
-      actualizarTablaResultados(resultados);
-    }
-  }
-}
-
-// Evento para ejecutar la búsqueda al hacer clic en el botón "Filtrar"
-document.addEventListener("DOMContentLoaded", () => {
-  const btnFiltrar = document.getElementById("btnFiltrar");
-  if (btnFiltrar) {
-    btnFiltrar.addEventListener("click", ejecutarFiltroInterfaz);
-  }
-});
