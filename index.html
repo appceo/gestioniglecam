@@ -261,4 +261,199 @@
                             if (sNom.includes('sin informacion')) sNom = '';
                             
                             const pApe = normalizarTexto(obtenerCampo(item, ['Primer Apellido', 'Primer Apelli']));
-                            let sApe
+                            let sApe = normalizarTexto(obtenerCampo(item, ['Segundo Apellido', 'Segundo Ape']));
+                            if (sApe.includes('sin informacion')) sApe = '';
+
+                            const textoCompleto = `${pNom} ${sNom} ${pApe} ${sApe}`;
+
+                            return palabras.every(palabra => textoCompleto.includes(palabra));
+                        }
+                    } catch(e) {
+                        console.error("Error filtrando registro:", e);
+                        return false;
+                    }
+                    return false;
+                });
+            }
+
+            renderizarTabla(resultadosFiltrados);
+        }
+
+        function renderizarTabla(lista) {
+            const tbody = document.getElementById('tablaCuerpo');
+            tbody.innerHTML = '';
+            registroSeleccionadoId = null;
+            deshabilitarBotonEditar();
+
+            document.getElementById('contadorRegistros').textContent = `${lista.length} registros mostrados`;
+
+            if (!lista || lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500 font-medium">No hay registros para mostrar. Ingrese un parámetro de búsqueda.</td></tr>`;
+                return;
+            }
+
+            lista.forEach((item) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 cursor-pointer border-b transition";
+                
+                tr.onclick = function() {
+                    const radio = tr.querySelector('input[type="radio"]');
+                    if (radio) { radio.checked = true; }
+                    seleccionarRegistro(item._id);
+                };
+
+                const pNom = obtenerCampo(item, ['Primer Nombre', 'Primer Nomb']);
+                let sNom = obtenerCampo(item, ['Segundo Nombre', 'Segundo Non']);
+                if (normalizarTexto(sNom).includes('sin informacion')) sNom = '';
+
+                const pApe = obtenerCampo(item, ['Primer Apellido', 'Primer Apelli']);
+                let sApe = obtenerCampo(item, ['Segundo Apellido', 'Segundo Ape']);
+                if (normalizarTexto(sApe).includes('sin informacion')) sApe = '';
+
+                const idVal = obtenerCampo(item, ['Identificación']);
+                const telVal = obtenerCampo(item, ['Teléfono Móvil', 'Teléfono Móv']);
+                const emailVal = obtenerCampo(item, ['E-mail']);
+                const iglesiaVal = obtenerCampo(item, ['Iglesia']);
+                const ciudadVal = obtenerCampo(item, ['Ciudad Iglesia', 'Ciudad Iglesi']);
+                const dirVal = obtenerCampo(item, ['Dirección iglesia', 'Dirección Iglesia']);
+
+                tr.innerHTML = `
+                    <td class="p-3 text-center"><input type="radio" name="selRegistro" value="${item._id}"></td>
+                    <td class="p-3 font-semibold text-slate-800">${idVal || ''}</td>
+                    <td class="p-3">${pNom || ''} ${sNom}</td>
+                    <td class="p-3">${pApe || ''} ${sApe}</td>
+                    <td class="p-3">${telVal || ''}</td>
+                    <td class="p-3 text-slate-600">${emailVal || ''}</td>
+                    <td class="p-3">${iglesiaVal || '-'}</td>
+                    <td class="p-3">${ciudadVal || '-'}</td>
+                    <td class="p-3">${dirVal || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function seleccionarRegistro(id) {
+            registroSeleccionadoId = id;
+            const btn = document.getElementById('btnEditar');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.classList.add('hover:bg-amber-600');
+        }
+
+        function deshabilitarBotonEditar() {
+            const btn = document.getElementById('btnEditar');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.classList.remove('hover:bg-amber-600');
+        }
+
+        function abrirModalCrear() {
+            document.getElementById('modalTitulo').textContent = "Nuevo Registro";
+            document.getElementById('frmPersona').reset();
+            document.getElementById('registroId').value = "";
+            document.getElementById('modalFormulario').classList.remove('hidden');
+        }
+
+        function abrirModalEditar() {
+            if (registroSeleccionadoId === null) return;
+            const r = baseDeDatos.find(item => item._id === registroSeleccionadoId);
+            if (!r) return;
+
+            document.getElementById('modalTitulo').textContent = "Editar Registro";
+            document.getElementById('registroId').value = r._id;
+            document.getElementById('f_identificacion').value = obtenerCampo(r, ['Identificación']) || '';
+            document.getElementById('f_edad').value = obtenerCampo(r, ['Edad']) || '';
+            document.getElementById('f_primer_nombre').value = obtenerCampo(r, ['Primer Nombre', 'Primer Nomb']) || '';
+            document.getElementById('f_segundo_nombre').value = obtenerCampo(r, ['Segundo Nombre', 'Segundo Non']) || '';
+            document.getElementById('f_primer_apellido').value = obtenerCampo(r, ['Primer Apellido', 'Primer Apelli']) || '';
+            document.getElementById('f_segundo_apellido').value = obtenerCampo(r, ['Segundo Apellido', 'Segundo Ape']) || '';
+            document.getElementById('f_estado_civil').value = obtenerCampo(r, ['Estado Civil']) || '';
+            document.getElementById('f_telefono').value = obtenerCampo(r, ['Teléfono Móvil', 'Teléfono Móv']) || '';
+            document.getElementById('f_email').value = obtenerCampo(r, ['E-mail']) || '';
+            document.getElementById('f_fecha_nacimiento').value = obtenerCampo(r, ['Fecha Nacimiento', 'Fecha Nacimi']) || '';
+            document.getElementById('f_iglesia').value = obtenerCampo(r, ['Iglesia']) || '';
+            document.getElementById('f_ciudad_iglesia').value = obtenerCampo(r, ['Ciudad Iglesia', 'Ciudad Iglesi']) || '';
+            document.getElementById('f_direccion_iglesia').value = obtenerCampo(r, ['Dirección iglesia', 'Dirección Iglesia']) || '';
+            
+            document.getElementById('modalFormulario').classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalFormulario').classList.add('hidden');
+        }
+
+        function guardarRegistro(e) {
+            e.preventDefault();
+            const idVal = document.getElementById('registroId').value;
+            
+            const registroNuevo = {
+                "_id": idVal !== "" ? parseInt(idVal) : Date.now(),
+                "Identificación": document.getElementById('f_identificacion').value.trim(),
+                "Edad": document.getElementById('f_edad').value.trim(),
+                "Primer Nombre": document.getElementById('f_primer_nombre').value.trim(),
+                "Segundo Nombre": document.getElementById('f_segundo_nombre').value.trim(),
+                "Primer Apellido": document.getElementById('f_primer_apellido').value.trim(),
+                "Segundo Apellido": document.getElementById('f_segundo_apellido').value.trim(),
+                "Estado Civil": document.getElementById('f_estado_civil').value.trim(),
+                "Teléfono Móvil": document.getElementById('f_telefono').value.trim(),
+                "E-mail": document.getElementById('f_email').value.trim(),
+                "Fecha Nacimiento": document.getElementById('f_fecha_nacimiento').value.trim(),
+                "Iglesia": document.getElementById('f_iglesia').value.trim(),
+                "Ciudad Iglesia": document.getElementById('f_ciudad_iglesia').value.trim(),
+                "Dirección iglesia": document.getElementById('f_direccion_iglesia').value.trim()
+            };
+
+            if (idVal !== "") {
+                const idx = baseDeDatos.findIndex(item => item._id === parseInt(idVal));
+                if (idx !== -1) baseDeDatos[idx] = registroNuevo;
+            } else {
+                baseDeDatos.unshift(registroNuevo);
+            }
+
+            cerrarModal();
+            buscarRegistros();
+            alert('Registro guardado exitosamente.');
+        }
+
+        function descargarExcel(datos, nombreArchivo) {
+            if (typeof XLSX === 'undefined') {
+                alert('La librería SheetJS para generar archivos Excel no se ha cargado correctamente. Verifique su conexión a internet.');
+                return;
+            }
+            if (!datos || datos.length === 0) {
+                alert('No hay datos para exportar.');
+                return;
+            }
+            try {
+                const datosLimpios = datos.map(({_id, ...resto}) => resto);
+                const ws = XLSX.utils.json_to_sheet(datosLimpios);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Miembros");
+                XLSX.writeFile(wb, `${nombreArchivo}.xlsx`);
+            } catch (err) {
+                console.error("Error al exportar a Excel:", err);
+                alert("Ocurrió un error al generar el archivo Excel: " + err.message);
+            }
+        }
+
+        function exportarExcelFiltrado() {
+            descargarExcel(resultadosFiltrados, 'Miembros_IGLECAM_Filtrados');
+        }
+
+        function exportarTodaLaBase() {
+            const selectOrden = document.getElementById('ordenExportacion');
+            const orden = selectOrden ? selectOrden.value : 'Primer Apellido';
+            
+            const copiaBD = [...baseDeDatos];
+            
+            copiaBD.sort((a, b) => {
+                const valA = normalizarTexto(obtenerCampo(a, [orden, 'Primer Apellido', 'Primer Apelli']));
+                const valB = normalizarTexto(obtenerCampo(b, [orden, 'Primer Apellido', 'Primer Apelli']));
+                return valA.localeCompare(valB);
+            });
+
+            descargarExcel(copiaBD, `Base_Completa_IGLECAM_${orden.replace(/\s+/g, '_')}`);
+        }
+    </script>
+</body>
+</html>
