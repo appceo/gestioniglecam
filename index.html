@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asociación Ministerial IGLECAM - Base de Datos</title>
-  <!-- Tailwind CSS para los estilos de la interfaz -->
+  <title>Sistema Gestor de Base de Datos - IGLECAM</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- SheetJS para la exportación a Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen pb-12">
 
-  <!-- HEADER / BARRA SUPERIOR -->
+  <!-- BARRA SUPERIOR / HEADER -->
   <header class="bg-indigo-950 text-white px-6 py-4 shadow-lg flex flex-wrap justify-between items-center gap-4">
     <div class="flex items-center space-x-3">
       <div class="bg-indigo-600 p-2.5 rounded-xl shadow-inner">
@@ -23,11 +25,7 @@
       </div>
     </div>
     <div class="flex items-center space-x-3">
-      <button class="bg-indigo-900/80 hover:bg-indigo-800 text-xs px-3.5 py-2 rounded-lg border border-indigo-700/50 flex items-center gap-2 transition-all">
-        <i data-lucide="github" class="w-4 h-4"></i>
-        <span>Configurar Sincronización GitHub</span>
-      </button>
-      <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-md transition-all">
+      <button onclick="abrirModalNuevo()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition-all">
         <i data-lucide="user-plus" class="w-4 h-4"></i>
         <span>+ Nuevo Registro</span>
       </button>
@@ -36,60 +34,64 @@
 
   <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
 
-    <!-- TARJETA BASE DE DATOS ACTUAL -->
-    <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex justify-between items-center flex-wrap gap-4">
+    <!-- RESUMEN DE REGISTROS -->
+    <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex justify-between items-center flex-wrap gap-4">
       <div class="flex items-center space-x-4">
-        <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">
-          5
+        <div id="badgeTotal" class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">
+          0
         </div>
         <div>
           <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Base de Datos Actual</span>
-          <p id="totalRegistrosInfo" class="text-sm font-semibold text-slate-700">Cargados 290 miembros desde el archivo inicial</p>
+          <p id="infoConteoBD" class="text-sm font-semibold text-slate-700">Cargando datos iniciales...</p>
         </div>
       </div>
-      <button onclick="resetearFiltros()" class="text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 flex items-center gap-1.5 transition-all">
+      <button onclick="restablecerBD()" class="text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 flex items-center gap-1.5 transition-all">
         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-        <span>Resetear Caché / Limpiar Temporales</span>
+        <span>Restablecer Datos de Fábrica</span>
       </button>
     </section>
 
     <!-- CONSULTA Y FILTRO DE MIEMBROS -->
-    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
       <div class="flex items-center space-x-2 text-indigo-900">
         <i data-lucide="search" class="w-5 h-5 text-indigo-600"></i>
         <h2 class="text-base font-bold">Consulta y Filtro de Miembros</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-        <!-- Criterio de Búsqueda -->
+        <!-- Selector de Parámetro -->
         <div class="md:col-span-4 space-y-1">
           <label class="text-xs font-semibold text-slate-600 block">Criterio de Búsqueda:</label>
-          <select id="criterioBusqueda" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
+          <select id="selectCriterio" onchange="alCambiarCriterio()" class="w-full text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
             <option value="combinado">Nombres / Apellidos (Combinado)</option>
-            <option value="nombres">Nombres</option>
-            <option value="apellidos">Apellidos</option>
             <option value="identificacion">Identificación</option>
+            <option value="apellidos">Apellidos</option>
+            <option value="nombres">Nombres</option>
+            <option value="telefono">Teléfono Móvil</option>
+            <option value="iglesia">Iglesia</option>
+            <option value="ciudadIglesia">Ciudad Iglesia</option>
+            <option value="direccionIglesia">Dirección Iglesia</option>
           </select>
         </div>
 
-        <!-- Campo de Texto -->
+        <!-- Campo de Entrada de Búsqueda -->
         <div class="md:col-span-5 space-y-1">
-          <label class="text-xs font-semibold text-slate-600 block">Escriba Nombre y/o Apellido (ej: Pedro Hernández):</label>
+          <label id="lblBusqueda" class="text-xs font-semibold text-slate-600 block">Escriba Nombre y/o Apellido (ej: Pedro Hernández):</label>
           <div class="relative">
-            <input type="text" id="inputBusqueda" placeholder="rodriguez" class="w-full text-sm border border-slate-300 rounded-xl pl-3 pr-8 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
-            <button onclick="limpiarInput()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+            <input type="text" id="inputBusqueda" placeholder="Ej: Rodriguez" class="w-full text-sm border border-slate-300 rounded-xl pl-3 pr-8 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
+            <button onclick="limpiarBuscador()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
               <i data-lucide="x-circle" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
 
-        <!-- Botones de Acción -->
+        <!-- Botones de Acción para Filtro -->
         <div class="md:col-span-3 flex items-center space-x-2">
-          <button id="btnFiltrar" onclick="ejecutarFiltro()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all">
+          <button onclick="ejecutarFiltro()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all">
             <i data-lucide="filter" class="w-4 h-4"></i>
             <span>Filtrar</span>
           </button>
-          <button onclick="exportarExcel()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm py-2 px-3 rounded-xl flex items-center justify-center gap-1 shadow-md transition-all">
+          <button onclick="exportarExcelFiltrado()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-2 px-3.5 rounded-xl flex items-center justify-center gap-1 shadow-md transition-all">
             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
             <span>Excel</span>
           </button>
@@ -97,37 +99,36 @@
       </div>
     </section>
 
-    <!-- SECCIÓN DE DESCARGA GLOBAL -->
+    <!-- SECCIÓN DE DESCARGA GLOBAL CON ORDENAMIENTO PREVIO -->
     <section class="bg-indigo-50/60 rounded-2xl p-4 border border-indigo-100 flex justify-between items-center flex-wrap gap-4">
       <div class="flex items-center space-x-3">
         <div class="bg-indigo-600 text-white p-2.5 rounded-xl">
-          <i data-lucide="file-output" class="w-5 h-5"></i>
+          <i data-lucide="download" class="w-5 h-5"></i>
         </div>
         <div>
           <h3 class="text-sm font-bold text-indigo-950">Descargar Toda la Base de Datos</h3>
-          <p class="text-xs text-indigo-600">Exporta todos los miembros a Excel ordenados previamente.</p>
+          <p class="text-xs text-indigo-600">Exporta la totalidad de miembros a un archivo Excel (.xlsx) previamente ordenados.</p>
         </div>
       </div>
       <div class="flex items-center space-x-3">
         <span class="text-xs font-semibold text-slate-600">Ordenar por:</span>
-        <select id="ordenarPor" onchange="ordenarYFiltrar()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white text-slate-700">
-          <option value="apellido_asc">Primer Apellido (A-Z)</option>
-          <option value="apellido_desc">Primer Apellido (Z-A)</option>
-          <option value="nombre_asc">Nombre (A-Z)</option>
+        <select id="selectOrden" class="text-xs border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-700">
+          <option value="apellido">Primer Apellido (A-Z)</option>
+          <option value="ciudad">Ciudad Iglesia (A-Z)</option>
         </select>
         <button onclick="descargarTodaBD()" class="bg-indigo-900 hover:bg-indigo-950 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-2 shadow transition-all">
-          <i data-lucide="download" class="w-4 h-4"></i>
+          <i data-lucide="file-output" class="w-4 h-4"></i>
           <span>Descargar Toda la BD (.xlsx)</span>
         </button>
       </div>
     </section>
 
     <!-- TABLA DE RESULTADOS -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden space-y-4">
-      <div class="p-4 bg-slate-50/50 border-b border-slate-200 flex justify-between items-center">
-        <span id="contadorRegistros" class="text-xs font-bold text-slate-600">Mostrando 0 de 0 registros</span>
-        <button class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-lg border border-amber-300/60 flex items-center gap-1.5 transition-all">
-          <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden space-y-4">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+        <span id="lblContador" class="text-xs font-bold text-slate-600">Mostrando 0 de 0 registros</span>
+        <button id="btnEditar" onclick="abrirModalEdicion()" disabled class="bg-amber-400 opacity-50 cursor-not-allowed text-amber-950 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
           <span>Editar Registro Seleccionado</span>
         </button>
       </div>
@@ -141,7 +142,7 @@
               <th class="p-3">Nombres</th>
               <th class="p-3">Apellidos</th>
               <th class="p-3">Edad</th>
-              <th class="p-3">Teléfono</th>
+              <th class="p-3">Teléfono Móvil</th>
               <th class="p-3">E-Mail</th>
               <th class="p-3">Estado Civil</th>
               <th class="p-3">Iglesia</th>
@@ -150,23 +151,486 @@
             </tr>
           </thead>
           <tbody id="tablaCuerpo" class="divide-y divide-slate-200">
-            <!-- Los registros filtrados se renderizan dinámicamente aquí -->
+            <!-- Filas inyectadas por JS -->
           </tbody>
         </table>
       </div>
 
-      <!-- ESTADO VACÍO (NO REGISTROS) -->
-      <div id="sinRegistros" class="hidden py-12 text-center space-y-3">
+      <!-- MENSAJE SIN RESULTADOS -->
+      <div id="divSinResultados" class="hidden py-12 text-center space-y-2">
         <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
-          <i data-lucide="folder-open" class="w-6 h-6"></i>
+          <i data-lucide="folder-search" class="w-6 h-6"></i>
         </div>
-        <p class="text-xs font-semibold text-slate-400">No se encontraron registros.</p>
+        <p class="text-xs font-semibold text-slate-400">No se encontraron registros coincidentes.</p>
       </div>
     </section>
 
   </main>
 
-  <!-- LÓGICA JAVASCRIPT CON NORMALIZACIÓN DE TEXTO -->
+  <!-- MODAL / FORMULARIO PARA CREAR O EDITAR REGISTRO -->
+  <div id="modalFormulario" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-indigo-950 text-white p-4 flex justify-between items-center">
+        <h3 id="modalTitulo" class="text-sm font-bold flex items-center gap-2">
+          <i data-lucide="user-check" class="w-4 h-4"></i>
+          <span>Editar Registro de Miembro</span>
+        </h3>
+        <button onclick="cerrarModal()" class="text-slate-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="formMiembro" onsubmit="guardarRegistro(event)" class="p-6 overflow-y-auto space-y-4 text-xs">
+        <input type="hidden" id="formIndexOriginal" value="-1">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Identificación (*):</label>
+            <input type="text" id="fieldIdentificacion" required class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Edad:</label>
+            <input type="text" id="fieldEdad" placeholder="Ej: 35 Años" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Primer Nombre (*):</label>
+            <input type="text" id="fieldPrimerNombre" required class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Segundo Nombre:</label>
+            <input type="text" id="fieldSegundoNombre" placeholder="Sin Información" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Primer Apellido (*):</label>
+            <input type="text" id="fieldPrimerApellido" required class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Segundo Apellido:</label>
+            <input type="text" id="fieldSegundoApellido" placeholder="Sin Información" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Teléfono Móvil:</label>
+            <input type="text" id="fieldTelefono" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">E-mail:</label>
+            <input type="email" id="fieldEmail" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Estado Civil:</label>
+            <select id="fieldEstadoCivil" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+              <option value="Soltero">Soltero</option>
+              <option value="Casado Por Ambas">Casado Por Ambas</option>
+              <option value="Casado Por La Iglesia">Casado Por La Iglesia</option>
+              <option value="Casado Por Lo Civil">Casado Por Lo Civil</option>
+              <option value="Divorciado">Divorciado</option>
+              <option value="Separado">Separado</option>
+              <option value="Viudo">Viudo</option>
+              <option value="Unión Libre">Unión Libre</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Fecha Nacimiento:</label>
+            <input type="text" id="fieldFechaNacimiento" placeholder="DD/MM/AAAA" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Campos de Iglesia para Editar -->
+        <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 space-y-3 mt-2">
+          <span class="font-bold text-indigo-900 block text-xs">Datos Ministeriales (Editables)</span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="font-semibold text-slate-600 block mb-1">Iglesia:</label>
+              <input type="text" id="fieldIglesia" placeholder="Ej: Igleco 127" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="font-semibold text-slate-600 block mb-1">Ciudad Iglesia:</label>
+              <input type="text" id="fieldCiudadIglesia" placeholder="Ej: Bogotá" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="font-semibold text-slate-600 block mb-1">Dirección Iglesia:</label>
+              <input type="text" id="fieldDireccionIglesia" placeholder="Ej: Cra. 49 #127D-59" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+          <button type="button" onclick="cerrarModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl text-slate-700 font-semibold">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-md">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LÓGICA DE APLICACIÓN EN JAVASCRIPT -->
   <script>
     // =========================================================================
-    // 1. BASE DE DATOS DE EJEMPLO (Sim
+    // DATOS DE LA TABLA "Base Iglecam.xlsx"
+    // =========================================================================
+    const datosInicialesExcel = [
+      {"Identificacion":"28822382","Edad":"21 Años","PrimerNombre":"Diana","SegundoNombre":"Sin Información","PrimerApellido":"Castro","SegundoApellido":"Sin Información","EstadoCivil":"Soltero","Telefono":"57","Email":"cdiana529@gmail.com","FechaNacimiento":"5/10/2005","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"1014227431","Edad":"34 Años","PrimerNombre":"Gian","SegundoNombre":"Carlos","PrimerApellido":"Jiménez","SegundoApellido":"Ramos","EstadoCivil":"Soltero","Telefono":"57","Email":"giancarlojimenez84@gmail.com","FechaNacimiento":"20/11/1991","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"19454490","Edad":"20 Años","PrimerNombre":"Alirio","SegundoNombre":"Sin Información","PrimerApellido":"Mahecha","SegundoApellido":"Acero","EstadoCivil":"Divorciado","Telefono":"57","Email":"alimahechacero@gmail.com","FechaNacimiento":"21/11/2005","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"1020736388","Edad":"37 Años","PrimerNombre":"Katherine","SegundoNombre":"Sin Información","PrimerApellido":"Said","SegundoApellido":"Fierro","EstadoCivil":"Casado Por Ambas","Telefono":"3002091933","Email":"katiesaidf@gmail.com","FechaNacimiento":"5/11/1988","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"51953184","Edad":"58 Años","PrimerNombre":"Sonia","SegundoNombre":"Liliana","PrimerApellido":"Oviedo","SegundoApellido":"Repizo","EstadoCivil":"Casado Por La Iglesia","Telefono":"3002141074","Email":"soliore68@gmail.com","FechaNacimiento":"21/07/1968","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"52804662","Edad":"45 Años","PrimerNombre":"Maryline","SegundoNombre":"Sin Información","PrimerApellido":"Palencia","SegundoApellido":"Contreras","EstadoCivil":"Casado Por Ambas","Telefono":"3002223407","Email":"marylinepalencia@gmail.com","FechaNacimiento":"03/09/1981","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"72224144","Edad":"50 Años","PrimerNombre":"Guillermo","SegundoNombre":"Sin Información","PrimerApellido":"Prieto","SegundoApellido":"Sin Información","EstadoCivil":"Casado Por Ambas","Telefono":"3002375930","Email":"jdfcguillermo.prieto@gmail.com","FechaNacimiento":"6/10/1976","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"80768536","Edad":"42 Años","PrimerNombre":"Jairo","SegundoNombre":"Andres","PrimerApellido":"Palacios","SegundoApellido":"Valderrama","EstadoCivil":"Casado Por Ambas","Telefono":"3003283987","Email":"jandresp31@gmail.com","FechaNacimiento":"31/08/1984","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"52716795","Edad":"44 Años","PrimerNombre":"Paola","SegundoNombre":"Andrea","PrimerApellido":"Parra","SegundoApellido":"Paniagua","EstadoCivil":"Casado Por Ambas","Telefono":"3003912643","Email":"polisaccesorios@hotmail.com","FechaNacimiento":"3/11/1981","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"80148671","Edad":"46 Años","PrimerNombre":"Francisco","SegundoNombre":"Javier","PrimerApellido":"Otero","SegundoApellido":"Perez","EstadoCivil":"Casado Por Ambas","Telefono":"3005394130","Email":"pastorpachootero@gmail.com","FechaNacimiento":"04/05/1980","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"51772053","Edad":"61 Años","PrimerNombre":"Patricia","SegundoNombre":"Sin Información","PrimerApellido":"Benavides","SegundoApellido":"Calvache","EstadoCivil":"Casado Por Ambas","Telefono":"3005516534","Email":"patybenca.1948@gmail.com","FechaNacimiento":"30/01/1965","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"11253286","Edad":"71 Años","PrimerNombre":"Luis","SegundoNombre":"Ernesto","PrimerApellido":"Triana","SegundoApellido":"Castro","EstadoCivil":"Casado Por Ambas","Telefono":"3005716107","Email":"le.tc@hotmail.com","FechaNacimiento":"13/09/1955","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"52917678","Edad":"20 Años","PrimerNombre":"Maira","SegundoNombre":"Alexandra","PrimerApellido":"Moncaleano","SegundoApellido":"Moncaleano","EstadoCivil":"Casado Por Lo Civil","Telefono":"3006595087","Email":"maalmo2@gmail.com","FechaNacimiento":"25/11/2005","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"4114248","Edad":"48 Años","PrimerNombre":"Jaime","SegundoNombre":"Humberto","PrimerApellido":"Ruiz","SegundoApellido":"Ussa","EstadoCivil":"Separado","Telefono":"3006796691","Email":"jaimehumbertoruizussa@gmail.com","FechaNacimiento":"15/09/1978","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"52966904","Edad":"42 Años","PrimerNombre":"Angelica","SegundoNombre":"Maria","PrimerApellido":"Gutiérrez","SegundoApellido":"Gutierrez","EstadoCivil":"Casado Por La Iglesia","Telefono":"3007037114","Email":"gelikvale24@hotmail.com","FechaNacimiento":"15/11/1983","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"51788411","Edad":"62 Años","PrimerNombre":"Yolanda","SegundoNombre":"Sin Información","PrimerApellido":"Castro","SegundoApellido":"Sin Información","EstadoCivil":"Divorciado","Telefono":"3007709650","Email":"yolandacastro.iam@gmail.com","FechaNacimiento":"14/10/1964","Iglesia":"","CiudadIglesia":"","DireccionIglesia":""},
+      {"Identificacion":"5935345","Edad":"59 Años","PrimerNombre":"Arcadio","SegundoNombre":"Sin Información","PrimerApellido":"Rodríguez","SegundoApellido":"Jiménez","EstadoCivil":"Casado Por Ambas","Telefono":"3015432406","Email":"arcadiorodriguezj@gmail.com","FechaNacimiento":"02/01/1967","Iglesia":"Igleco 127","CiudadIglesia":"Bogotá","DireccionIglesia":"Cra. 49 #127D-59"},
+      {"Identificacion":"1018436585","Edad":"36 Años","PrimerNombre":"Leidy","SegundoNombre":"Yurley","PrimerApellido":"López","SegundoApellido":"Rodríguez","EstadoCivil":"Soltero","Telefono":"3102234538","Email":"contaworld01@gmail.com","FechaNacimiento":"19/07/1990","Iglesia":"Igleco 76","CiudadIglesia":"Bogotá","DireccionIglesia":"Cl. 76 #20B-55"}
+    ];
+
+    // Variables de Estado
+    let baseDatosGlobal = [];
+    let resultadosVisibles = [];
+    let indiceSeleccionado = -1;
+
+    // Inicializar la App y cargar localStorage si existe
+    function inicializar() {
+      const datosGuardados = localStorage.getItem("iglecam_bd_v1");
+      if (datosGuardados) {
+        baseDatosGlobal = JSON.parse(datosGuardados);
+      } else {
+        baseDatosGlobal = [...datosInicialesExcel];
+        guardarEnStorage();
+      }
+
+      actualizarResumenBD();
+      ejecutarFiltro();
+      lucide.createIcons();
+    }
+
+    function guardarEnStorage() {
+      localStorage.setItem("iglecam_bd_v1", JSON.stringify(baseDatosGlobal));
+      actualizarResumenBD();
+    }
+
+    function restablecerBD() {
+      if (confirm("¿Desea restablecer los datos originales de la tabla inicial?")) {
+        baseDatosGlobal = [...datosInicialesExcel];
+        guardarEnStorage();
+        ejecutarFiltro();
+      }
+    }
+
+    function actualizarResumenBD() {
+      document.getElementById("badgeTotal").textContent = baseDatosGlobal.length;
+      document.getElementById("infoConteoBD").textContent = `Cargados ${baseDatosGlobal.length} miembros en el sistema`;
+    }
+
+    // =========================================================================
+    // NORMALIZACIÓN DE TEXTO
+    // =========================================================================
+    function normalizarTexto(texto) {
+      if (texto === null || texto === undefined) return "";
+      return texto
+        .toString()
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")                  // Separa vocales de sus diacríticos
+        .replace(/[\u0300-\u036f]/g, ""); // Elimina marcas de acentos
+    }
+
+    // =========================================================================
+    // FILTRADO Y BÚSQUEDA
+    // =========================================================================
+    function alCambiarCriterio() {
+      const criterio = document.getElementById("selectCriterio").value;
+      const lbl = document.getElementById("lblBusqueda");
+      const input = document.getElementById("inputBusqueda");
+
+      switch(criterio) {
+        case "combinado":
+          lbl.textContent = "Escriba Nombre y/o Apellido (ej: Pedro Hernández):";
+          input.placeholder = "Ej: Pedro Rodriguez";
+          break;
+        case "identificacion":
+          lbl.textContent = "Escriba Número de Identificación:";
+          input.placeholder = "Ej: 1014227431";
+          break;
+        case "nombres":
+          lbl.textContent = "Escriba Nombres:";
+          input.placeholder = "Ej: Gian Carlos";
+          break;
+        case "apellidos":
+          lbl.textContent = "Escriba Apellidos:";
+          input.placeholder = "Ej: Rodríguez";
+          break;
+        case "telefono":
+          lbl.textContent = "Escriba Teléfono Móvil:";
+          input.placeholder = "Ej: 3002091933";
+          break;
+        case "iglesia":
+          lbl.textContent = "Escriba Nombre de la Iglesia:";
+          input.placeholder = "Ej: Igleco 127";
+          break;
+        case "ciudadIglesia":
+          lbl.textContent = "Escriba Ciudad de la Iglesia:";
+          input.placeholder = "Ej: Bogotá";
+          break;
+        case "direccionIglesia":
+          lbl.textContent = "Escriba Dirección de la Iglesia:";
+          input.placeholder = "Ej: Cra. 49";
+          break;
+      }
+      ejecutarFiltro();
+    }
+
+    function ejecutarFiltro() {
+      const criterio = document.getElementById("selectCriterio").value;
+      const busquedaLimpia = normalizarTexto(document.getElementById("inputBusqueda").value);
+
+      if (!busquedaLimpia) {
+        resultadosVisibles = [...baseDatosGlobal];
+      } else {
+        resultadosVisibles = baseDatosGlobal.filter(m => {
+          const id = normalizarTexto(m.Identificacion);
+          const pNombre = normalizarTexto(m.PrimerNombre);
+          const sNombre = normalizarTexto(m.SegundoNombre !== "Sin Información" ? m.SegundoNombre : "");
+          const pApellido = normalizarTexto(m.PrimerApellido);
+          const sApellido = normalizarTexto(m.SegundoApellido !== "Sin Información" ? m.SegundoApellido : "");
+          const nombresComp = `${pNombre} ${sNombre}`.trim();
+          const apellidosComp = `${pApellido} ${sApellido}`.trim();
+          const nombreCompleto = `${nombresComp} ${apellidosComp}`;
+
+          const tel = normalizarTexto(m.Telefono);
+          const iglesia = normalizarTexto(m.Iglesia);
+          const ciudad = normalizarTexto(m.CiudadIglesia);
+          const direccion = normalizarTexto(m.DireccionIglesia);
+
+          switch(criterio) {
+            case "combinado":
+              return nombreCompleto.includes(busquedaLimpia) || nombresComp.includes(busquedaLimpia) || apellidosComp.includes(busquedaLimpia);
+            case "identificacion":
+              return id.includes(busquedaLimpia);
+            case "nombres":
+              return nombresComp.includes(busquedaLimpia);
+            case "apellidos":
+              return apellidosComp.includes(busquedaLimpia);
+            case "telefono":
+              return tel.includes(busquedaLimpia);
+            case "iglesia":
+              return iglesia.includes(busquedaLimpia);
+            case "ciudadIglesia":
+              return ciudad.includes(busquedaLimpia);
+            case "direccionIglesia":
+              return direccion.includes(busquedaLimpia);
+            default:
+              return nombreCompleto.includes(busquedaLimpia);
+          }
+        });
+      }
+
+      deseleccionarRegistro();
+      renderizarTabla();
+    }
+
+    function renderizarTabla() {
+      const tbody = document.getElementById("tablaCuerpo");
+      const divSin = document.getElementById("divSinResultados");
+      const contador = document.getElementById("lblContador");
+
+      tbody.innerHTML = "";
+      contador.textContent = `Mostrando ${resultadosVisibles.length} de ${baseDatosGlobal.length} registros`;
+
+      if (resultadosVisibles.length === 0) {
+        divSin.classList.remove("hidden");
+        return;
+      } else {
+        divSin.classList.add("hidden");
+      }
+
+      resultadosVisibles.forEach((m, idxVis) => {
+        const idxOriginal = baseDatosGlobal.indexOf(m);
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-indigo-50/50 cursor-pointer transition-all";
+        tr.onclick = () => seleccionarFila(idxOriginal, tr);
+
+        const sSegNombre = m.SegundoNombre && m.SegundoNombre !== "Sin Información" ? " " + m.SegundoNombre : "";
+        const sSegApellido = m.SegundoApellido && m.SegundoApellido !== "Sin Información" ? " " + m.SegundoApellido : "";
+
+        tr.innerHTML = `
+          <td class="p-3 text-center"><input type="radio" name="rdSeleccion" id="rd_${idxOriginal}" class="text-indigo-600 focus:ring-indigo-500"></td>
+          <td class="p-3 font-semibold text-slate-700">${m.Identificacion}</td>
+          <td class="p-3 font-medium">${m.PrimerNombre}${sSegNombre}</td>
+          <td class="p-3 font-medium">${m.PrimerApellido}${sSegApellido}</td>
+          <td class="p-3">${m.Edad}</td>
+          <td class="p-3">${m.Telefono}</td>
+          <td class="p-3 text-indigo-600 underline">${m.Email}</td>
+          <td class="p-3">${m.EstadoCivil}</td>
+          <td class="p-3 font-semibold text-slate-800">${m.Iglesia || '<span class="text-slate-300 font-normal">Sin asignar</span>'}</td>
+          <td class="p-3">${m.CiudadIglesia || '<span class="text-slate-300 font-normal">Sin asignar</span>'}</td>
+          <td class="p-3 text-slate-500">${m.DireccionIglesia || '<span class="text-slate-300 font-normal">Sin asignar</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function seleccionarFila(indexOriginal, elementoTr) {
+      document.querySelectorAll("#tablaCuerpo tr").forEach(tr => tr.classList.remove("bg-indigo-100/70"));
+      elementoTr.classList.add("bg-indigo-100/70");
+
+      const rd = document.getElementById(`rd_${indexOriginal}`);
+      if (rd) rd.checked = true;
+
+      indiceSeleccionado = indexOriginal;
+      const btnEditar = document.getElementById("btnEditar");
+      btnEditar.disabled = false;
+      btnEditar.classList.remove("opacity-50", "cursor-not-allowed");
+      btnEditar.classList.add("hover:bg-amber-300");
+    }
+
+    function deseleccionarRegistro() {
+      indiceSeleccionado = -1;
+      const btnEditar = document.getElementById("btnEditar");
+      btnEditar.disabled = true;
+      btnEditar.classList.add("opacity-50", "cursor-not-allowed");
+      btnEditar.classList.remove("hover:bg-amber-300");
+    }
+
+    function limpiarBuscador() {
+      document.getElementById("inputBusqueda").value = "";
+      ejecutarFiltro();
+    }
+
+    // =========================================================================
+    // MODAL Y FORMULARIO (CREAR / EDITAR)
+    // =========================================================================
+    function abrirModalNuevo() {
+      document.getElementById("modalTitulo").innerHTML = `<i data-lucide="user-plus" class="w-4 h-4"></i><span>Crear Nuevo Registro de Miembro</span>`;
+      document.getElementById("formIndexOriginal").value = "-1";
+      document.getElementById("formMiembro").reset();
+      document.getElementById("modalFormulario").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function abrirModalEdicion() {
+      if (indiceSeleccionado < 0) return;
+      const m = baseDatosGlobal[indiceSeleccionado];
+
+      document.getElementById("modalTitulo").innerHTML = `<i data-lucide="edit-3" class="w-4 h-4"></i><span>Editar Registro de Miembro</span>`;
+      document.getElementById("formIndexOriginal").value = indiceSeleccionado;
+
+      document.getElementById("fieldIdentificacion").value = m.Identificacion || "";
+      document.getElementById("fieldEdad").value = m.Edad || "";
+      document.getElementById("fieldPrimerNombre").value = m.PrimerNombre || "";
+      document.getElementById("fieldSegundoNombre").value = m.SegundoNombre || "";
+      document.getElementById("fieldPrimerApellido").value = m.PrimerApellido || "";
+      document.getElementById("fieldSegundoApellido").value = m.SegundoApellido || "";
+      document.getElementById("fieldTelefono").value = m.Telefono || "";
+      document.getElementById("fieldEmail").value = m.Email || "";
+      document.getElementById("fieldEstadoCivil").value = m.EstadoCivil || "Soltero";
+      document.getElementById("fieldFechaNacimiento").value = m.FechaNacimiento || "";
+      document.getElementById("fieldIglesia").value = m.Iglesia || "";
+      document.getElementById("fieldCiudadIglesia").value = m.CiudadIglesia || "";
+      document.getElementById("fieldDireccionIglesia").value = m.DireccionIglesia || "";
+
+      document.getElementById("modalFormulario").classList.remove("hidden");
+      lucide.createIcons();
+    }
+
+    function cerrarModal() {
+      document.getElementById("modalFormulario").classList.add("hidden");
+    }
+
+    function guardarRegistro(e) {
+      e.preventDefault();
+      const index = parseInt(document.getElementById("formIndexOriginal").value);
+
+      const objetoMiembro = {
+        Identificacion: document.getElementById("fieldIdentificacion").value.trim(),
+        Edad: document.getElementById("fieldEdad").value.trim() || "Sin Información",
+        PrimerNombre: document.getElementById("fieldPrimerNombre").value.trim(),
+        SegundoNombre: document.getElementById("fieldSegundoNombre").value.trim() || "Sin Información",
+        PrimerApellido: document.getElementById("fieldPrimerApellido").value.trim(),
+        SegundoApellido: document.getElementById("fieldSegundoApellido").value.trim() || "Sin Información",
+        EstadoCivil: document.getElementById("fieldEstadoCivil").value,
+        Telefono: document.getElementById("fieldTelefono").value.trim(),
+        Email: document.getElementById("fieldEmail").value.trim(),
+        FechaNacimiento: document.getElementById("fieldFechaNacimiento").value.trim(),
+        Iglesia: document.getElementById("fieldIglesia").value.trim(),
+        CiudadIglesia: document.getElementById("fieldCiudadIglesia").value.trim(),
+        DireccionIglesia: document.getElementById("fieldDireccionIglesia").value.trim()
+      };
+
+      if (index >= 0) {
+        baseDatosGlobal[index] = objetoMiembro;
+      } else {
+        baseDatosGlobal.unshift(objetoMiembro);
+      }
+
+      guardarEnStorage();
+      cerrarModal();
+      ejecutarFiltro();
+    }
+
+    // =========================================================================
+    // EXPORTACIÓN A EXCEL (.XLSX)
+    // =========================================================================
+    function generarArchivoExcel(listaDatos, nombreArchivo) {
+      if (!listaDatos || listaDatos.length === 0) {
+        alert("No hay registros para exportar.");
+        return;
+      }
+
+      // Mapear claves a nombres formales de columna
+      const datosExcel = listaDatos.map(m => ({
+        "Identificación": m.Identificacion,
+        "Edad": m.Edad,
+        "Primer Nombre": m.PrimerNombre,
+        "Segundo Nombre": m.SegundoNombre,
+        "Primer Apellido": m.PrimerApellido,
+        "Segundo Apellido": m.SegundoApellido,
+        "Estado Civil": m.EstadoCivil,
+        "Teléfono Móvil": m.Telefono,
+        "E-mail": m.Email,
+        "Fecha Nacimiento": m.FechaNacimiento,
+        "Iglesia": m.Iglesia,
+        "Ciudad Iglesia": m.CiudadIglesia,
+        "Dirección Iglesia": m.DireccionIglesia
+      }));
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Miembros IGLECAM");
+      XLSX.writeFile(libro, `${nombreArchivo}.xlsx`);
+    }
+
+    function exportarExcelFiltrado() {
+      generarArchivoExcel(resultadosVisibles, "Miembros_Filtrados_IGLECAM");
+    }
+
+    function descargarTodaBD() {
+      const criterioOrden = document.getElementById("selectOrden").value;
+      const bdOrdenada = [...baseDatosGlobal];
+
+      bdOrdenada.sort((a, b) => {
+        if (criterioOrden === "apellido") {
+          return normalizarTexto(a.PrimerApellido).localeCompare(normalizarTexto(b.PrimerApellido));
+        } else if (criterioOrden === "ciudad") {
+          return normalizarTexto(a.CiudadIglesia).localeCompare(normalizarTexto(b.CiudadIglesia));
+        }
+        return 0;
+      });
+
+      generarArchivoExcel(bdOrdenada, `Base_Datos_IGLECAM_Completa_${criterioOrden}`);
+    }
+
+    // Listener para buscar con la tecla Enter
+    document.getElementById("inputBusqueda").addEventListener("keyup", (e) => {
+      if (e.key === "Enter") ejecutarFiltro();
+    });
+
+    // Iniciar App
+    document.addEventListener("DOMContentLoaded", inicializar);
+  </script>
+</body>
+</html>
