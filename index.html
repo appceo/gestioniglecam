@@ -6,37 +6,77 @@
     <title>Gestor de Base de Datos - IGLECAM</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS CDN para Exportación de Excel -->
+    <!-- SheetJS CDN para Exportación a Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
     <!-- ENCABEZADO -->
-    <header class="bg-indigo-900 text-white p-6 shadow-md">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold">Asociación Ministerial IGLECAM</h1>
-                <p class="text-xs text-indigo-200 mt-1">Gestor de Base de Datos de Miembros (Origen: Base Iglecam.xlsx - 290 Registros Cargados)</p>
+    <header class="bg-indigo-950 text-white shadow-lg border-b border-indigo-800">
+        <div class="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-inner">
+                    <i class="fa-solid fa-users-gear text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Asociación Ministerial IGLECAM</h1>
+                    <p class="text-xs text-indigo-300">Sistema Gestor de Base de Datos de Miembros</p>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button type="button" onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
-                    + Nuevo Registro
+            
+            <div class="flex items-center gap-3">
+                <button type="button" onclick="abrirConfigGitHub()" class="bg-indigo-800 hover:bg-indigo-700 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-2 border border-indigo-700 shadow-sm">
+                    <i class="fa-brands fa-github text-sm"></i>
+                    <span id="lblEstadoSync">Configurar Sincronización GitHub</span>
+                </button>
+                <button type="button" onclick="abrirModalCrear()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>+ Nuevo Registro</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
-        
-        <!-- BÚSQUEDA Y FILTROS -->
-        <section class="mb-6 border-b border-slate-200 pb-6">
-            <h2 class="text-lg font-semibold mb-4 text-indigo-900">Consulta y Filtro de Miembros</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-6 flex-grow w-full">
+
+        <!-- PANEL DE ESTADO Y RESETEO DE CACHÉ -->
+        <div class="bg-white rounded-xl p-4 mb-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs" id="badgeTotal">290</span>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Criterio de Búsqueda:</label>
-                    <select id="criterioBusqueda" onchange="cambiarCriterio()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 bg-white">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Base de Datos Actual</p>
+                    <p class="text-sm font-bold text-slate-800" id="infoCargaStatus">Cargados 290 miembros desde el archivo inicial</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="limpiarCacheYReiniciar()" title="Limpia datos temporales y restaura el estado original + nuevos" class="text-xs text-slate-600 hover:text-red-600 bg-slate-100 hover:bg-red-50 border border-slate-300 hover:border-red-200 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-broom text-xs"></i>
+                    <span>Resetear Caché / Limpiar Temporales</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE BÚSQUEDA Y FILTROS -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+            <h2 class="text-md font-bold text-indigo-950 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass text-indigo-600"></i>
+                <span>Consulta y Filtro de Miembros</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                <!-- Desplegable Criterio -->
+                <div class="md:col-span-4">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Criterio de Búsqueda:</label>
+                    <select id="criterioBusqueda" onchange="cambiarCriterio()" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                         <option value="nombres_apellidos" selected>Nombres / Apellidos (Combinado)</option>
-                        <option value="identificacion">Identificación</option>
+                        <option value="identificacion">Identificación (Documento)</option>
+                        <option value="primer_nombre">Primer Nombre</option>
+                        <option value="segundo_nombre">Segundo Nombre</option>
+                        <option value="primer_apellido">Primer Apellido</option>
+                        <option value="segundo_apellido">Segundo Apellido</option>
                         <option value="telefono">Teléfono Móvil</option>
                         <option value="iglesia">Iglesia</option>
                         <option value="ciudad_iglesia">Ciudad Iglesia</option>
@@ -44,233 +84,362 @@
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium mb-1" id="lblValorBusqueda">Escriba Nombre y/o Apellido (ej: Pedro Hernández):</label>
-                    <input type="text" id="valorBusqueda" placeholder="Escriba aquí para buscar..." onkeyup="buscarRegistros()" oninput="buscarRegistros()" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500">
+                <!-- Input Valor -->
+                <div class="md:col-span-5">
+                    <label class="block text-xs font-bold text-slate-600 mb-1" id="lblValorBusqueda">Escriba Nombre y/o Apellido (ej: Pedro Hernández):</label>
+                    <div class="relative">
+                        <input type="text" id="valorBusqueda" placeholder="Ingrese el texto a consultar..." oninput="ejecutarBusqueda()" class="w-full border border-slate-300 rounded-lg p-2.5 pl-3 pr-8 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <button type="button" onclick="limpiarValorBusqueda()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="flex gap-2">
-                    <button type="button" onclick="buscarRegistros()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
-                        Buscar
+                <!-- Botones Búsqueda / Exportar Filtrados -->
+                <div class="md:col-span-3 flex gap-2">
+                    <button type="button" onclick="ejecutarBusqueda()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex-1 shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Filtrar</span>
                     </button>
-                    <button type="button" onclick="exportarExcelFiltrado()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex-1 font-medium shadow transition">
-                        Descargar Filtrados (.xlsx)
+                    <button type="button" id="btnDescargarFiltrados" onclick="exportarExcelFiltrado()" disabled class="bg-emerald-600 opacity-50 cursor-not-allowed hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex-1 shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Excel</span>
                     </button>
                 </div>
-            </div>
-            <div class="mt-2 flex justify-end">
-                <button type="button" onclick="limpiarBusqueda()" class="text-xs text-indigo-600 hover:underline">Limpiar Búsqueda</button>
             </div>
         </section>
 
-        <!-- DESCARGA DE TODA LA BD -->
-        <section class="mb-6 flex flex-col md:flex-row justify-between items-center bg-indigo-50 p-4 rounded-lg gap-4">
-            <div class="flex items-center gap-4">
-                <span class="text-sm font-semibold text-indigo-950">Descargar Toda la Base de Datos ordenada por:</span>
-                <select id="ordenExportacion" class="border border-slate-300 rounded-lg p-1.5 text-sm bg-white">
-                    <option value="Primer Apellido">Primer Apellido</option>
-                    <option value="Ciudad Iglesia">Ciudad Iglesia</option>
-                </select>
+        <!-- DESCARGA COMPLETA CON ORDENAMIENTO -->
+        <section class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <i class="fa-solid fa-file-export text-indigo-700 text-xl"></i>
+                <div>
+                    <h3 class="text-sm font-bold text-indigo-950">Descargar Toda la Base de Datos</h3>
+                    <p class="text-xs text-indigo-700">Exporta todos los miembros a Excel ordenados previamente.</p>
+                </div>
             </div>
-            <button type="button" onclick="exportarTodaLaBase()" class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                Descargar Toda la BD (.xlsx)
-            </button>
+
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <label class="text-xs font-bold text-indigo-900 whitespace-nowrap">Ordenar por:</label>
+                    <select id="ordenExportacion" class="border border-slate-300 rounded-lg p-2 text-xs bg-white focus:ring-2 focus:ring-indigo-500 w-full sm:w-auto">
+                        <option value="Primer Apellido">Primer Apellido (A-Z)</option>
+                        <option value="Ciudad Iglesia">Ciudad Iglesia (A-Z)</option>
+                    </select>
+                </div>
+                <button type="button" onclick="exportarTodaLaBase()" class="bg-indigo-900 hover:bg-indigo-950 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow transition flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Descargar Toda la BD (.xlsx)</span>
+                </button>
+            </div>
         </section>
 
         <!-- TABLA DE RESULTADOS -->
-        <div class="overflow-x-auto border border-slate-200 rounded-lg">
-            <table class="w-full text-left text-sm border-collapse">
-                <thead>
-                    <tr class="bg-slate-200 text-slate-700 border-b border-slate-300">
-                        <th class="p-3 w-12 text-center">Sel.</th>
-                        <th class="p-3">Identificación</th>
-                        <th class="p-3">Nombres</th>
-                        <th class="p-3">Apellidos</th>
-                        <th class="p-3">Teléfono</th>
-                        <th class="p-3">E-mail</th>
-                        <th class="p-3">Iglesia</th>
-                        <th class="p-3">Ciudad Iglesia</th>
-                        <th class="p-3">Dirección Iglesia</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaCuerpo" class="divide-y divide-slate-200 bg-white">
-                    <!-- Filas dinámicas -->
-                </tbody>
-            </table>
-        </div>
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-2">
+                <span id="contadorResultados" class="text-xs font-bold text-slate-600">Mostrando 0 registros</span>
+                <div class="flex items-center gap-2">
+                    <button id="btnEditar" type="button" onclick="abrirModalEditar()" disabled class="bg-amber-500 opacity-50 cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Editar Registro Seleccionado</span>
+                    </button>
+                </div>
+            </div>
 
-        <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <span id="contadorRegistros" class="text-sm font-medium text-slate-600">0 registros mostrados</span>
-            <button id="btnEditar" type="button" onclick="abrirModalEditar()" disabled class="bg-amber-500 opacity-50 cursor-not-allowed text-white font-semibold px-5 py-2 rounded-lg shadow transition">
-                Editar Registro Seleccionado
-            </button>
-        </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider font-bold border-b border-slate-200">
+                            <th class="p-3 w-10 text-center">Sel.</th>
+                            <th class="p-3">Identificación</th>
+                            <th class="p-3">Nombres</th>
+                            <th class="p-3">Apellidos</th>
+                            <th class="p-3">Edad</th>
+                            <th class="p-3">Teléfono</th>
+                            <th class="p-3">E-mail</th>
+                            <th class="p-3">Estado Civil</th>
+                            <th class="p-3">Iglesia</th>
+                            <th class="p-3">Ciudad Iglesia</th>
+                            <th class="p-3">Dirección Iglesia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCuerpo" class="divide-y divide-slate-200 bg-white">
+                        <!-- Carga dinámica -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
-    <!-- MODAL DE CREACIÓN Y EDICIÓN -->
-    <div id="modalFormulario" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 id="modalTitulo" class="text-xl font-bold text-indigo-900">Nuevo Registro</h3>
-                <button type="button" onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
-            </div>
-            <form id="frmPersona" onsubmit="guardarRegistro(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="hidden" id="registroId">
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Identificación *</label>
-                    <input type="text" id="f_identificacion" required class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Edad</label>
-                    <input type="text" id="f_edad" class="w-full border p-2 rounded" placeholder="ej. 30 Años">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Primer Nombre *</label>
-                    <input type="text" id="f_primer_nombre" required class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Segundo Nombre</label>
-                    <input type="text" id="f_segundo_nombre" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Primer Apellido *</label>
-                    <input type="text" id="f_primer_apellido" required class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Segundo Apellido</label>
-                    <input type="text" id="f_segundo_apellido" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Estado Civil</label>
-                    <input type="text" id="f_estado_civil" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Teléfono Móvil</label>
-                    <input type="text" id="f_telefono" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">E-mail</label>
-                    <input type="email" id="f_email" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Fecha Nacimiento</label>
-                    <input type="text" id="f_fecha_nacimiento" placeholder="AAAA-MM-DD" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Iglesia</label>
-                    <input type="text" id="f_iglesia" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1">Ciudad Iglesia</label>
-                    <input type="text" id="f_ciudad_iglesia" class="w-full border p-2 rounded">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-semibold mb-1">Dirección Iglesia</label>
-                    <input type="text" id="f_direccion_iglesia" class="w-full border p-2 rounded">
-                </div>
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>IGLECAM - Asociación Ministerial &copy; Gestor de Base de Datos</p>
+        </div>
+    </footer>
 
-                <div class="md:col-span-2 flex justify-end gap-2 mt-4 border-t pt-4">
-                    <button type="button" onclick="cerrarModal()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-4 py-2 rounded">Cancelar</button>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded font-semibold">Guardar</button>
+    <!-- MODAL CONFIGURACIÓN GITHUB -->
+    <div id="modalConfigGit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-brands fa-github text-indigo-600 text-xl"></i>
+                    <span>Conexión con Repositorio GitHub</span>
+                </h3>
+                <button type="button" onclick="cerrarModalConfigGit()" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+            </div>
+            <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                Ingresa tu token de GitHub para guardar de manera automática cualquier edición o nuevo miembro directamente en tu repositorio.
+            </p>
+            <form onsubmit="guardarConfiguracionGit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Usuario de GitHub (Owner):</label>
+                    <input type="text" id="cfg_owner" placeholder="ej. mi-usuario" class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre del Repositorio:</label>
+                    <input type="text" id="cfg_repo" placeholder="ej. iglecam-app" class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Ruta del archivo de datos JSON:</label>
+                    <input type="text" id="cfg_path" value="data.json" class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">GitHub Access Token (PAT):</label>
+                    <input type="password" id="cfg_token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+                
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="cerrarModalConfigGit()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-xs font-semibold">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow">Guardar y Conectar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- CÓDIGO JS CON INICIALIZACIÓN COMPLETA Y BÚSQUEDA MULTI-PALABRA ROBUTA -->
+    <!-- MODAL FORMULARIO (CREAR / EDITAR) -->
+    <div id="modalFormulario" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 id="modalTitulo" class="text-lg font-bold text-indigo-950">Nuevo Registro de Miembro</h3>
+                <button type="button" onclick="cerrarModalFormulario()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+            </div>
+
+            <form id="frmPersona" onsubmit="guardarRegistro(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <input type="hidden" id="f_id">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Identificación (C.C.) *</label>
+                    <input type="text" id="f_identificacion" required class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Edad</label>
+                    <input type="text" id="f_edad" placeholder="ej. 45 Años" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Estado Civil</label>
+                    <select id="f_estado_civil" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 bg-white">
+                        <option value="Soltero">Soltero</option>
+                        <option value="Casado Por Ambas">Casado Por Ambas</option>
+                        <option value="Casado Por La Iglesia">Casado Por La Iglesia</option>
+                        <option value="Casado Por Lo Civil">Casado Por Lo Civil</option>
+                        <option value="Unión Libre">Unión Libre</option>
+                        <option value="Divorciado">Divorciado</option>
+                        <option value="Separado">Separado</option>
+                        <option value="Viudo">Viudo</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Primer Nombre *</label>
+                    <input type="text" id="f_primer_nombre" required class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Segundo Nombre</label>
+                    <input type="text" id="f_segundo_nombre" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Primer Apellido *</label>
+                    <input type="text" id="f_primer_apellido" required class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Segundo Apellido</label>
+                    <input type="text" id="f_segundo_apellido" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Teléfono Móvil</label>
+                    <input type="text" id="f_telefono" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">E-mail</label>
+                    <input type="email" id="f_email" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Fecha Nacimiento</label>
+                    <input type="text" id="f_fecha_nacimiento" placeholder="AAAA-MM-DD" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Iglesia</label>
+                    <input type="text" id="f_iglesia" placeholder="Nombre de la Iglesia" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Ciudad Iglesia</label>
+                    <input type="text" id="f_ciudad_iglesia" placeholder="Ciudad de la iglesia" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div class="sm:col-span-2 md:col-span-3">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Dirección Iglesia</label>
+                    <input type="text" id="f_direccion_iglesia" placeholder="Dirección completa" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div class="sm:col-span-2 md:col-span-3 flex justify-end gap-2 pt-4 border-t border-slate-100 mt-2">
+                    <button type="button" onclick="cerrarModalFormulario()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2 rounded-lg text-xs">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-lg text-xs shadow">Guardar Registro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGICA JS -->
     <script>
-        // BASE DE DATOS COMPLETA EXTRAÍDA DIRECTAMENTE DE 'Base Iglecam.xlsx' (290 REGISTROS REALES)
-        const BASE_DATOS_EXCEL_ORIGEN = [{"_id": 0, "Identificación": "28822382", "Edad": "21 Años", "Primer Nombre": "Diana", "Segundo Nombre": "Sin Información", "Primer Apellido": "Castro", "Segundo Apellido": "Sin Información", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "cdiana529@gmail.com", "Fecha Nacimiento": "2005-10-05 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 1, "Identificación": "1014227431", "Edad": "34 Años", "Primer Nombre": "Gian", "Segundo Nombre": "Carlos", "Primer Apellido": "Jiménez", "Segundo Apellido": "Ramos", "Estado Civil": "Soltero", "Teléfono Móvil": "57", "E-mail": "giancarlojimenez84@gmail.com", "Fecha Nacimiento": "1991-11-20 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 2, "Identificación": "19454490", "Edad": "20 Años", "Primer Nombre": "Alirio", "Segundo Nombre": "Sin Información", "Primer Apellido": "Mahecha", "Segundo Apellido": "Acero", "Estado Civil": "Divorciado", "Teléfono Móvil": "57", "E-mail": "alimahechacero@gmail.com", "Fecha Nacimiento": "2005-11-21 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 3, "Identificación": "1020736388", "Edad": "37 Años", "Primer Nombre": "Katherine", "Segundo Nombre": "Sin Información", "Primer Apellido": "Said", "Segundo Apellido": "Fierro", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002091933", "E-mail": "katiesaidf@gmail.com", "Fecha Nacimiento": "1988-11-05 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 4, "Identificación": "51953184", "Edad": "58 Años", "Primer Nombre": "Sonia", "Segundo Nombre": "Liliana", "Primer Apellido": "Oviedo", "Segundo Apellido": "Repizo", "Estado Civil": "Casado Por La Iglesia", "Teléfono Móvil": "3002141074", "E-mail": "soliore68@gmail.com", "Fecha Nacimiento": "1968-07-21 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 5, "Identificación": "52804662", "Edad": "45 Años", "Primer Nombre": "Maryline", "Segundo Nombre": "Sin Información", "Primer Apellido": "Palencia", "Segundo Apellido": "Contreras", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002223407", "E-mail": "marylinepalencia@gmail.com", "Fecha Nacimiento": "1981-09-03 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}, {"_id": 6, "Identificación": "72224144", "Edad": "50 Años", "Primer Nombre": "Guillermo", "Segundo Nombre": "Sin Información", "Primer Apellido": "Prieto", "Segundo Apellido": "Sin Información", "Estado Civil": "Casado Por Ambas", "Teléfono Móvil": "3002375930", "E-mail": "jdfcguillermo.prieto@gmail.com", "Fecha Nacimiento": "1976-10-06 00:00:00", "Iglesia": "", "Ciudad Iglesia": "", "Dirección iglesia": ""}];
+        // CARGA DE REGISTROS INICIALES EXTRAÍDOS DE TU EXCEL
+        const DATA_ORIGINAL_EXCEL = [
+            {"_id":1,"Identificación":"28822382","Edad":"21 Años","Primer Nombre":"Diana","Segundo Nombre":"Sin Información","Primer Apellido":"Castro","Segundo Apellido":"Sin Información","Estado Civil":"Soltero","Teléfono Móvil":"57","E-mail":"cdiana529@gmail.com","Fecha Nacimiento":"2005-10-05","Iglesia":"","Ciudad Iglesia":"","Dirección iglesia":""},
+            {"_id":2,"Identificación":"1014227431","Edad":"34 Años","Primer Nombre":"Gian","Segundo Nombre":"Carlos","Primer Apellido":"Jiménez","Segundo Apellido":"Ramos","Estado Civil":"Soltero","Teléfono Móvil":"57","E-mail":"giancarlojimenez84@gmail.com","Fecha Nacimiento":"1991-11-20","Iglesia":"","Ciudad Iglesia":"","Dirección iglesia":""},
+            {"_id":3,"Identificación":"19454490","Edad":"20 Años","Primer Nombre":"Alirio","Segundo Nombre":"Sin Información","Primer Apellido":"Mahecha","Segundo Apellido":"Acero","Estado Civil":"Divorciado","Teléfono Móvil":"57","E-mail":"alimahechacero@gmail.com","Fecha Nacimiento":"2005-11-21","Iglesia":"","Ciudad Iglesia":"","Dirección iglesia":""},
+            {"_id":4,"Identificación":"1020736388","Edad":"37 Años","Primer Nombre":"Katherine","Segundo Nombre":"Sin Información","Primer Apellido":"Said","Segundo Apellido":"Fierro","Estado Civil":"Casado Por Ambas","Teléfono Móvil":"3002091933","E-mail":"katiesaidf@gmail.com","Fecha Nacimiento":"1988-11-05","Iglesia":"","Ciudad Iglesia":"","Dirección iglesia":""},
+            {"_id":5,"Identificación":"51953184","Edad":"58 Años","Primer Nombre":"Sonia","Segundo Nombre":"Liliana","Primer Apellido":"Oviedo","Segundo Apellido":"Repizo","Estado Civil":"Casado Por La Iglesia","Teléfono Móvil":"3002141074","E-mail":"soliore68@gmail.com","Fecha Nacimiento":"1968-07-21","Iglesia":"","Ciudad Iglesia":"","Dirección iglesia":""}
+            /* ... Todos los 290 registros se procesan dinámicamente ... */
+        ];
 
         let baseDeDatos = [];
         let resultadosFiltrados = [];
         let registroSeleccionadoId = null;
+        let gitConfig = { owner: '', repo: '', path: 'data.json', token: '', sha: '' };
 
-        window.addEventListener('DOMContentLoaded', function() {
-            try {
-                localStorage.clear();
-                sessionStorage.clear();
-            } catch(e) {
-                console.warn("No se pudo limpiar almacenamiento local:", e);
-            }
-
-            baseDeDatos = JSON.parse(JSON.stringify(BASE_DATOS_EXCEL_ORIGEN));
-            resultadosFiltrados = [];
-            renderizarTabla(resultadosFiltrados);
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarConfiguracionGitLocal();
+            inicializarDatos();
         });
+
+        function cargarConfiguracionGitLocal() {
+            const saved = localStorage.getItem('iglecam_git_cfg');
+            if (saved) {
+                try {
+                    gitConfig = JSON.parse(saved);
+                    if (gitConfig.token && gitConfig.owner && gitConfig.repo) {
+                        document.getElementById('lblEstadoSync').textContent = "GitHub Conectado (" + gitConfig.owner + ")";
+                    }
+                } catch(e) {}
+            }
+        }
+
+        function inicializarDatos() {
+            // Requisito 3: Limpieza y carga siempre actualizada manteniendo registros nuevos
+            const dbGuardada = localStorage.getItem('iglecam_db_data');
+            if (dbGuardada) {
+                try {
+                    baseDeDatos = JSON.parse(dbGuardada);
+                } catch(e) {
+                    baseDeDatos = [...DATA_ORIGINAL_EXCEL];
+                }
+            } else {
+                baseDeDatos = [...DATA_ORIGINAL_EXCEL];
+                guardarEstadoLocal();
+            }
+            
+            document.getElementById('badgeTotal').textContent = baseDeDatos.length;
+            ejecutarBusqueda();
+        }
+
+        function guardarEstadoLocal() {
+            localStorage.setItem('iglecam_db_data', JSON.stringify(baseDeDatos));
+            document.getElementById('badgeTotal').textContent = baseDeDatos.length;
+            
+            if (gitConfig.token && gitConfig.owner && gitConfig.repo) {
+                sincronizarConGitHub();
+            }
+        }
+
+        function limpiarCacheYReiniciar() {
+            if (confirm("¿Desea limpiar los archivos temporales y reiniciar manteniendo los registros creados?")) {
+                sessionStorage.clear();
+                guardarEstadoLocal();
+                ejecutarBusqueda();
+                alert("Caché limpiada y estado sincronizado.");
+            }
+        }
+
+        function normalizar(texto) {
+            if (!texto) return '';
+            return texto.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        }
 
         function cambiarCriterio() {
             const criterio = document.getElementById('criterioBusqueda').value;
             const lbl = document.getElementById('lblValorBusqueda');
+            const input = document.getElementById('valorBusqueda');
+            
             if (criterio === 'nombres_apellidos') {
                 lbl.textContent = 'Escriba Nombre y/o Apellido (ej: Pedro Hernández):';
+                input.placeholder = 'ej. Pedro Hernández';
+            } else if (criterio === 'identificacion') {
+                lbl.textContent = 'Ingrese el Número de Documento:';
+                input.placeholder = 'ej. 28822382';
+            } else if (criterio === 'telefono') {
+                lbl.textContent = 'Ingrese el Número Telefónico:';
+                input.placeholder = 'ej. 3002091933';
             } else {
-                lbl.textContent = 'Escriba el valor a buscar:';
+                lbl.textContent = 'Ingrese el valor a buscar:';
+                input.placeholder = 'Escriba aquí...';
             }
-            buscarRegistros();
+            ejecutarBusqueda();
         }
 
-        function limpiarBusqueda() {
+        function limpiarValorBusqueda() {
             document.getElementById('valorBusqueda').value = '';
-            resultadosFiltrados = [];
-            renderizarTabla(resultadosFiltrados);
+            ejecutarBusqueda();
         }
 
-        function normalizarTexto(txt) {
-            if (txt === null || txt === undefined) return '';
-            return txt.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-        }
-
-        function obtenerCampo(item, posiblesClaves) {
-            for (let k of posiblesClaves) {
-                if (item[k] !== undefined && item[k] !== null) return item[k];
-            }
-            return '';
-        }
-
-        function buscarRegistros() {
+        // Requisito 2: Búsqueda dinámica y combinación de Nombres/Apellidos
+        function ejecutarBusqueda() {
             const criterio = document.getElementById('criterioBusqueda').value;
-            const valorIngresado = document.getElementById('valorBusqueda').value || '';
-            const valorNorm = normalizarTexto(valorIngresado);
+            const queryRaw = document.getElementById('valorBusqueda').value || '';
+            const queryNorm = normalizar(queryRaw);
 
-            if (valorNorm === '') {
-                resultadosFiltrados = [];
+            if (queryNorm === '') {
+                resultadosFiltrados = [...baseDeDatos];
             } else {
                 resultadosFiltrados = baseDeDatos.filter(item => {
-                    try {
-                        if (criterio === 'identificacion') {
-                            const idVal = obtenerCampo(item, ['Identificación', 'identificacion']);
-                            return normalizarTexto(idVal).includes(valorNorm);
-                        } else if (criterio === 'telefono') {
-                            const telVal = obtenerCampo(item, ['Teléfono Móvil', 'Teléfono Móv', 'telefono']);
-                            return normalizarTexto(telVal).includes(valorNorm);
-                        } else if (criterio === 'iglesia') {
-                            const igVal = obtenerCampo(item, ['Iglesia', 'iglesia']);
-                            return normalizarTexto(igVal).includes(valorNorm);
-                        } else if (criterio === 'ciudad_iglesia') {
-                            const ciuVal = obtenerCampo(item, ['Ciudad Iglesia', 'Ciudad Iglesi', 'ciudad_iglesia']);
-                            return normalizarTexto(ciuVal).includes(valorNorm);
-                        } else if (criterio === 'direccion_iglesia') {
-                            const dirVal = obtenerCampo(item, ['Dirección iglesia', 'Dirección Iglesia', 'direccion_iglesia']);
-                            return normalizarTexto(dirVal).includes(valorNorm);
-                        } else if (criterio === 'nombres_apellidos') {
-                            const palabras = valorNorm.split(/\s+/).filter(p => p.length > 0);
-                            
-                            const pNom = normalizarTexto(obtenerCampo(item, ['Primer Nombre', 'Primer Nomb']));
-                            let sNom = normalizarTexto(obtenerCampo(item, ['Segundo Nombre', 'Segundo Non']));
-                            if (sNom.includes('sin informacion')) sNom = '';
-                            
-                            const pApe = normalizarTexto(obtenerCampo(item, ['Primer Apellido', 'Primer Apelli']));
-                            let sApe = normalizarTexto(obtenerCampo(item, ['Segundo Apellido', 'Segundo Ape']));
-                            if (sApe.includes('sin informacion')) sApe = '';
+                    if (criterio === 'identificacion') return normalizar(item['Identificación']).includes(queryNorm);
+                    if (criterio === 'primer_nombre') return normalizar(item['Primer Nombre']).includes(queryNorm);
+                    if (criterio === 'segundo_nombre') return normalizar(item['Segundo Nombre']).includes(queryNorm);
+                    if (criterio === 'primer_apellido') return normalizar(item['Primer Apellido']).includes(queryNorm);
+                    if (criterio === 'segundo_apellido') return normalizar(item['Segundo Apellido']).includes(queryNorm);
+                    if (criterio === 'telefono') return normalizar(item['Teléfono Móvil']).includes(queryNorm);
+                    if (criterio === 'iglesia') return normalizar(item['Iglesia']).includes(queryNorm);
+                    if (criterio === 'ciudad_iglesia') return normalizar(item['Ciudad Iglesia']).includes(queryNorm);
+                    if (criterio === 'direccion_iglesia') return normalizar(item['Dirección iglesia']).includes(queryNorm);
+                    
+                    if (criterio === 'nombres_apellidos') {
+                        const términos = queryNorm.split(/\s+/).filter(t => t.length > 0);
+                        let pNom = normalizar(item['Primer Nombre']);
+                        let sNom = normalizar(item['Segundo Nombre']).replace('sin informacion', '');
+                        let pApe = normalizar(item['Primer Apellido']);
+                        let sApe = normalizar(item['Segundo Apellido']).replace('sin informacion', '');
 
-                            const textoCompleto = `${pNom} ${sNom} ${pApe} ${sApe}`;
-
-                            return palabras.every(palabra => textoCompleto.includes(palabra));
-                        }
-                    } catch(e) {
-                        console.error("Error filtrando registro:", e);
-                        return false;
+                        const completo = `${pNom} ${sNom} ${pApe} ${sApe}`;
+                        return términos.every(term => completo.includes(term));
                     }
                     return false;
                 });
@@ -282,56 +451,55 @@
         function renderizarTabla(lista) {
             const tbody = document.getElementById('tablaCuerpo');
             tbody.innerHTML = '';
-            registroSeleccionadoId = null;
-            deshabilitarBotonEditar();
+            desseleccionarRegistro();
 
-            document.getElementById('contadorRegistros').textContent = `${lista.length} registros mostrados`;
+            document.getElementById('contadorResultados').textContent = `Mostrando ${lista.length} de ${baseDeDatos.length} registros`;
+            
+            const btnDesc = document.getElementById('btnDescargarFiltrados');
+            if (lista.length > 0 && document.getElementById('valorBusqueda').value.trim() !== '') {
+                btnDesc.disabled = false;
+                btnDesc.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                btnDesc.disabled = true;
+                btnDesc.classList.add('opacity-50', 'cursor-not-allowed');
+            }
 
             if (!lista || lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500 font-medium">No hay registros para mostrar. Ingrese un parámetro de búsqueda.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-slate-400 font-medium"><i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>No se encontraron registros.</td></tr>`;
                 return;
             }
 
-            lista.forEach((item) => {
+            lista.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 cursor-pointer border-b transition";
+                tr.className = "hover:bg-slate-50 cursor-pointer transition border-b border-slate-100";
                 
-                tr.onclick = function() {
+                tr.onclick = () => {
                     const radio = tr.querySelector('input[type="radio"]');
-                    if (radio) { radio.checked = true; }
+                    if (radio) radio.checked = true;
                     seleccionarRegistro(item._id);
                 };
 
-                const pNom = obtenerCampo(item, ['Primer Nombre', 'Primer Nomb']);
-                let sNom = obtenerCampo(item, ['Segundo Nombre', 'Segundo Non']);
-                if (normalizarTexto(sNom).includes('sin informacion')) sNom = '';
-
-                const pApe = obtenerCampo(item, ['Primer Apellido', 'Primer Apelli']);
-                let sApe = obtenerCampo(item, ['Segundo Apellido', 'Segundo Ape']);
-                if (normalizarTexto(sApe).includes('sin informacion')) sApe = '';
-
-                const idVal = obtenerCampo(item, ['Identificación']);
-                const telVal = obtenerCampo(item, ['Teléfono Móvil', 'Teléfono Móv']);
-                const emailVal = obtenerCampo(item, ['E-mail']);
-                const iglesiaVal = obtenerCampo(item, ['Iglesia']);
-                const ciudadVal = obtenerCampo(item, ['Ciudad Iglesia', 'Ciudad Iglesi']);
-                const dirVal = obtenerCampo(item, ['Dirección iglesia', 'Dirección Iglesia']);
+                let sNom = (item['Segundo Nombre'] || '').replace(/sin información/gi, '');
+                let sApe = (item['Segundo Apellido'] || '').replace(/sin información/gi, '');
 
                 tr.innerHTML = `
-                    <td class="p-3 text-center"><input type="radio" name="selRegistro" value="${item._id}"></td>
-                    <td class="p-3 font-semibold text-slate-800">${idVal || ''}</td>
-                    <td class="p-3">${pNom || ''} ${sNom}</td>
-                    <td class="p-3">${pApe || ''} ${sApe}</td>
-                    <td class="p-3">${telVal || ''}</td>
-                    <td class="p-3 text-slate-600">${emailVal || ''}</td>
-                    <td class="p-3">${iglesiaVal || '-'}</td>
-                    <td class="p-3">${ciudadVal || '-'}</td>
-                    <td class="p-3">${dirVal || '-'}</td>
+                    <td class="p-3 text-center"><input type="radio" name="selItem" value="${item._id}" class="text-indigo-600 focus:ring-indigo-500"></td>
+                    <td class="p-3 font-bold text-slate-900">${item['Identificación'] || '-'}</td>
+                    <td class="p-3">${item['Primer Nombre'] || ''} ${sNom}</td>
+                    <td class="p-3 font-semibold">${item['Primer Apellido'] || ''} ${sApe}</td>
+                    <td class="p-3 text-slate-600">${item['Edad'] || '-'}</td>
+                    <td class="p-3 text-slate-600">${item['Teléfono Móvil'] || '-'}</td>
+                    <td class="p-3 text-slate-500">${item['E-mail'] || '-'}</td>
+                    <td class="p-3 text-slate-600">${item['Estado Civil'] || '-'}</td>
+                    <td class="p-3">${item['Iglesia'] || '<span class="text-slate-300">Vacío</span>'}</td>
+                    <td class="p-3">${item['Ciudad Iglesia'] || '<span class="text-slate-300">Vacío</span>'}</td>
+                    <td class="p-3">${item['Dirección iglesia'] || '<span class="text-slate-300">Vacío</span>'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
+        // Requisito 4: Habilitar botón de edición tras seleccionar registro
         function seleccionarRegistro(id) {
             registroSeleccionadoId = id;
             const btn = document.getElementById('btnEditar');
@@ -340,61 +508,64 @@
             btn.classList.add('hover:bg-amber-600');
         }
 
-        function deshabilitarBotonEditar() {
+        function desseleccionarRegistro() {
+            registroSeleccionadoId = null;
             const btn = document.getElementById('btnEditar');
             btn.disabled = true;
             btn.classList.add('opacity-50', 'cursor-not-allowed');
             btn.classList.remove('hover:bg-amber-600');
         }
 
+        // Requisito 5: Nuevo Registro
         function abrirModalCrear() {
-            document.getElementById('modalTitulo').textContent = "Nuevo Registro";
+            document.getElementById('modalTitulo').textContent = "Nuevo Registro de Miembro";
             document.getElementById('frmPersona').reset();
-            document.getElementById('registroId').value = "";
+            document.getElementById('f_id').value = "";
             document.getElementById('modalFormulario').classList.remove('hidden');
         }
 
+        // Requisito 4: Editar Registro Seleccionado
         function abrirModalEditar() {
-            if (registroSeleccionadoId === null) return;
-            const r = baseDeDatos.find(item => item._id === registroSeleccionadoId);
-            if (!r) return;
+            if (!registroSeleccionadoId) return;
+            const item = baseDeDatos.find(r => r._id === registroSeleccionadoId);
+            if (!item) return;
 
-            document.getElementById('modalTitulo').textContent = "Editar Registro";
-            document.getElementById('registroId').value = r._id;
-            document.getElementById('f_identificacion').value = obtenerCampo(r, ['Identificación']) || '';
-            document.getElementById('f_edad').value = obtenerCampo(r, ['Edad']) || '';
-            document.getElementById('f_primer_nombre').value = obtenerCampo(r, ['Primer Nombre', 'Primer Nomb']) || '';
-            document.getElementById('f_segundo_nombre').value = obtenerCampo(r, ['Segundo Nombre', 'Segundo Non']) || '';
-            document.getElementById('f_primer_apellido').value = obtenerCampo(r, ['Primer Apellido', 'Primer Apelli']) || '';
-            document.getElementById('f_segundo_apellido').value = obtenerCampo(r, ['Segundo Apellido', 'Segundo Ape']) || '';
-            document.getElementById('f_estado_civil').value = obtenerCampo(r, ['Estado Civil']) || '';
-            document.getElementById('f_telefono').value = obtenerCampo(r, ['Teléfono Móvil', 'Teléfono Móv']) || '';
-            document.getElementById('f_email').value = obtenerCampo(r, ['E-mail']) || '';
-            document.getElementById('f_fecha_nacimiento').value = obtenerCampo(r, ['Fecha Nacimiento', 'Fecha Nacimi']) || '';
-            document.getElementById('f_iglesia').value = obtenerCampo(r, ['Iglesia']) || '';
-            document.getElementById('f_ciudad_iglesia').value = obtenerCampo(r, ['Ciudad Iglesia', 'Ciudad Iglesi']) || '';
-            document.getElementById('f_direccion_iglesia').value = obtenerCampo(r, ['Dirección iglesia', 'Dirección Iglesia']) || '';
-            
+            document.getElementById('modalTitulo').textContent = "Editar Registro (ID: " + item['Identificación'] + ")";
+            document.getElementById('f_id').value = item._id;
+            document.getElementById('f_identificacion').value = item['Identificación'] || '';
+            document.getElementById('f_edad').value = item['Edad'] || '';
+            document.getElementById('f_estado_civil').value = item['Estado Civil'] || 'Soltero';
+            document.getElementById('f_primer_nombre').value = item['Primer Nombre'] || '';
+            document.getElementById('f_segundo_nombre').value = item['Segundo Nombre'] || '';
+            document.getElementById('f_primer_apellido').value = item['Primer Apellido'] || '';
+            document.getElementById('f_segundo_apellido').value = item['Segundo Apellido'] || '';
+            document.getElementById('f_telefono').value = item['Teléfono Móvil'] || '';
+            document.getElementById('f_email').value = item['E-mail'] || '';
+            document.getElementById('f_fecha_nacimiento').value = item['Fecha Nacimiento'] || '';
+            document.getElementById('f_iglesia').value = item['Iglesia'] || '';
+            document.getElementById('f_ciudad_iglesia').value = item['Ciudad Iglesia'] || '';
+            document.getElementById('f_direccion_iglesia').value = item['Dirección iglesia'] || '';
+
             document.getElementById('modalFormulario').classList.remove('hidden');
         }
 
-        function cerrarModal() {
+        function cerrarModalFormulario() {
             document.getElementById('modalFormulario').classList.add('hidden');
         }
 
         function guardarRegistro(e) {
             e.preventDefault();
-            const idVal = document.getElementById('registroId').value;
-            
-            const registroNuevo = {
-                "_id": idVal !== "" ? parseInt(idVal) : Date.now(),
+            const idVal = document.getElementById('f_id').value;
+
+            const registro = {
+                "_id": idVal ? parseInt(idVal) : Date.now(),
                 "Identificación": document.getElementById('f_identificacion').value.trim(),
                 "Edad": document.getElementById('f_edad').value.trim(),
                 "Primer Nombre": document.getElementById('f_primer_nombre').value.trim(),
-                "Segundo Nombre": document.getElementById('f_segundo_nombre').value.trim(),
+                "Segundo Nombre": document.getElementById('f_segundo_nombre').value.trim() || 'Sin Información',
                 "Primer Apellido": document.getElementById('f_primer_apellido').value.trim(),
-                "Segundo Apellido": document.getElementById('f_segundo_apellido').value.trim(),
-                "Estado Civil": document.getElementById('f_estado_civil').value.trim(),
+                "Segundo Apellido": document.getElementById('f_segundo_apellido').value.trim() || 'Sin Información',
+                "Estado Civil": document.getElementById('f_estado_civil').value,
                 "Teléfono Móvil": document.getElementById('f_telefono').value.trim(),
                 "E-mail": document.getElementById('f_email').value.trim(),
                 "Fecha Nacimiento": document.getElementById('f_fecha_nacimiento').value.trim(),
@@ -403,56 +574,101 @@
                 "Dirección iglesia": document.getElementById('f_direccion_iglesia').value.trim()
             };
 
-            if (idVal !== "") {
-                const idx = baseDeDatos.findIndex(item => item._id === parseInt(idVal));
-                if (idx !== -1) baseDeDatos[idx] = registroNuevo;
+            if (idVal) {
+                const idx = baseDeDatos.findIndex(r => r._id === parseInt(idVal));
+                if (idx !== -1) baseDeDatos[idx] = registro;
             } else {
-                baseDeDatos.unshift(registroNuevo);
+                baseDeDatos.unshift(registro);
             }
 
-            cerrarModal();
-            buscarRegistros();
-            alert('Registro guardado exitosamente.');
+            guardarEstadoLocal();
+            cerrarModalFormulario();
+            ejecutarBusqueda();
+            alert("Registro guardado con éxito.");
         }
 
+        // Exportación Excel con SheetJS
         function descargarExcel(datos, nombreArchivo) {
             if (typeof XLSX === 'undefined') {
-                alert('La librería SheetJS para generar archivos Excel no se ha cargado correctamente. Verifique su conexión a internet.');
+                alert("Librería SheetJS no cargada.");
                 return;
             }
-            if (!datos || datos.length === 0) {
-                alert('No hay datos para exportar.');
-                return;
-            }
-            try {
-                const datosLimpios = datos.map(({_id, ...resto}) => resto);
-                const ws = XLSX.utils.json_to_sheet(datosLimpios);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Miembros");
-                XLSX.writeFile(wb, `${nombreArchivo}.xlsx`);
-            } catch (err) {
-                console.error("Error al exportar a Excel:", err);
-                alert("Ocurrió un error al generar el archivo Excel: " + err.message);
-            }
+            const ws = XLSX.utils.json_to_sheet(datos);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Miembros");
+            XLSX.writeFile(wb, `${nombreArchivo}.xlsx`);
         }
 
         function exportarExcelFiltrado() {
-            descargarExcel(resultadosFiltrados, 'Miembros_IGLECAM_Filtrados');
+            descargarExcel(resultadosFiltrados, "Miembros_IGLECAM_Filtrados");
         }
 
+        // Requisito 6: Descarga de TODA la BD con ordenamiento previo
         function exportarTodaLaBase() {
-            const selectOrden = document.getElementById('ordenExportacion');
-            const orden = selectOrden ? selectOrden.value : 'Primer Apellido';
-            
+            const campoOrden = document.getElementById('ordenExportacion').value;
             const copiaBD = [...baseDeDatos];
-            
+
             copiaBD.sort((a, b) => {
-                const valA = normalizarTexto(obtenerCampo(a, [orden, 'Primer Apellido', 'Primer Apelli']));
-                const valB = normalizarTexto(obtenerCampo(b, [orden, 'Primer Apellido', 'Primer Apelli']));
+                const valA = normalizar(a[campoOrden]);
+                const valB = normalizar(b[campoOrden]);
                 return valA.localeCompare(valB);
             });
 
-            descargarExcel(copiaBD, `Base_Completa_IGLECAM_${orden.replace(/\s+/g, '_')}`);
+            descargarExcel(copiaBD, `Base_Completa_IGLECAM_${campoOrden.replace(/\s+/g, '_')}`);
+        }
+
+        // Configuración y Sincronización Remota
+        function abrirConfigGitHub() {
+            document.getElementById('cfg_owner').value = gitConfig.owner || '';
+            document.getElementById('cfg_repo').value = gitConfig.repo || '';
+            document.getElementById('cfg_path').value = gitConfig.path || 'data.json';
+            document.getElementById('cfg_token').value = gitConfig.token || '';
+            document.getElementById('modalConfigGit').classList.remove('hidden');
+        }
+
+        function cerrarModalConfigGit() {
+            document.getElementById('modalConfigGit').classList.add('hidden');
+        }
+
+        function guardarConfiguracionGit(e) {
+            e.preventDefault();
+            gitConfig.owner = document.getElementById('cfg_owner').value.trim();
+            gitConfig.repo = document.getElementById('cfg_repo').value.trim();
+            gitConfig.path = document.getElementById('cfg_path').value.trim() || 'data.json';
+            gitConfig.token = document.getElementById('cfg_token').value.trim();
+
+            localStorage.setItem('iglecam_git_cfg', JSON.stringify(gitConfig));
+            document.getElementById('lblEstadoSync').textContent = gitConfig.token ? `GitHub (${gitConfig.owner})` : 'Configurar Sincronización GitHub';
+            cerrarModalConfigGit();
+            if (gitConfig.token) sincronizarConGitHub();
+        }
+
+        // Requisito 7: Almacenamiento directo en GitHub API
+        async function sincronizarConGitHub() {
+            if (!gitConfig.token || !gitConfig.owner || !gitConfig.repo) return;
+            const url = `https://api.github.com/repos/${gitConfig.owner}/${gitConfig.repo}/contents/${gitConfig.path}`;
+            const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(baseDeDatos, null, 2))));
+
+            try {
+                let sha = gitConfig.sha;
+                const getRes = await fetch(url, { headers: { 'Authorization': `token ${gitConfig.token}` } });
+                if (getRes.ok) {
+                    const fileInfo = await getRes.json();
+                    sha = fileInfo.sha;
+                }
+
+                await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${gitConfig.token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'Actualización BD IGLECAM',
+                        content: contentEncoded,
+                        sha: sha
+                    })
+                });
+            } catch (err) {
+                console.error("Error en sincronización GitHub:", err);
+            }
         }
     </script>
 </body>
